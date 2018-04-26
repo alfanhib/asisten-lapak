@@ -1,35 +1,82 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image } from 'react-native'
-import { Container, Content, Icon,View,Text } from 'native-base';
+import { StyleSheet, Image, ScrollView, RefreshControl } from 'react-native'
+import { Container, Content, Fab, Icon, Text, View } from 'native-base';
+
+import axios from 'axios'
+import config from '../../../../config'
 
 import Row from '../../../../components/Row'
 
 export default class TabDemand extends Component {
+
+    getAllData() {
+        this.setState({ refreshing: true });
+        axios.get(`${config.uri}/data/stores?props=name%2Caddress%2Clogo&loadRelations=assistant`).then((stores) => {
+            this.setState({ stores: stores.data, refreshing: false })
+        })
+    }
+
+    componentDidMount() {
+        this.getAllData()
+    }
+
+    state = {
+        refreshing: true,
+        stores : []
+    }
+
     render() {
         return (
             <Container>
-                <Content style={{ margin: 10 }}>
+                <ScrollView
+                    style={{ backgroundColor: 'white' }}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={this.getAllData.bind(this)}
+                        />
+                    }
+                >
 
-                    <Row
-                        body={(
-                            <View style={{ flexDirection: 'row' }}>
-                                <Image style={styles.rowImage}
-                                    source={require('../../../../assets/images/market.png')}
-                                />
-                                <View style={{ flex: 5, paddingLeft: 10 }}>
-                                    <Text style={styles.rowTextTitle}>Els Komputer</Text>
-                                    <Text style={styles.rowTextAsist}>Asisten CS</Text>
-                                    <Text style={styles.rowTextAsistName}>Hafiz Joundy Syafie</Text>
-                                    <Text style={styles.rowTextAddress}>JL DI Panjaitan No 128 Purwokerto</Text>
-                                </View>
-                            </View>
-                        )}
-                        onpress={{
-                            view: () => this.props.navigation.navigate('FieldHomeProductList')
-                        }}
-                    />
+                    <Content>
 
-                </Content>
+                        {/* {this.state.loading == true ? (<Spinner color='red' />) : null} */}
+
+                        {(this.state.loading == false) && (this.state.stores.length) == 0 ? (
+                            <Text style={{ textAlign: 'center', marginTop: 10 }}>No data</Text>
+                        ) : null}
+
+                        {this.state.stores.map((store, indexes) => (
+                            <Row
+                                body={(
+                                    <View style={{ flexDirection: 'row', paddingLeft: 20, paddingRight: 20 }}>
+                                        <Image style={styles.rowImage}
+                                            source={{ uri: store.logo }}
+                                        />
+                                        <View style={{ flex: 6, paddingLeft: 10 }}>
+                                            <Text style={styles.rowTextTitle}>{store.name}</Text>
+                                            <Text style={styles.rowTextAsist}>Asisten CS</Text>
+                                            <Text style={styles.rowTextAsistName}>{store.assistant.name}</Text>
+                                            <Text style={styles.rowTextAddress}>{store.address}</Text>
+                                        </View>
+                                    </View>
+                                )
+                                }
+                                onpress={{
+                                    view: () => this.props.navigation.navigate('FieldHomeProductList')
+                                }}
+                                key={indexes}
+                            />
+                        ))}
+
+                    </Content>
+
+                </ScrollView>
+
+                <Fab style={{ backgroundColor: '#DD5453' }} onPress={()=>this.props.navigation.navigate('FieldHomeAddStore')}>
+                    <Icon name="add" />
+                </Fab>
+
             </Container>
         )
     }
@@ -38,9 +85,7 @@ export default class TabDemand extends Component {
 const styles = StyleSheet.create({
     rowImage: {
         resizeMode: 'contain',
-        width: 50,
-        height: 50,
-        flex: 1
+        flex: 2
     },
     rowTextTitle:{
         fontSize: 20,
