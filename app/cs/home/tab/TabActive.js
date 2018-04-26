@@ -7,7 +7,7 @@ import config from '../../../../config'
 
 import Row from '../../../../components/Row'
 
-export default class TabDemand extends Component {
+export default class TabActive extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
@@ -63,7 +63,7 @@ export default class TabDemand extends Component {
                                 )
                                 }
                                 onpress={{
-                                    view: () => this.props.navigation.navigate('FieldHomeProductList')
+                                    view: () => alert('test brroooooooo')
                                 }}
                                 key={indexes}
                             />
@@ -72,6 +72,11 @@ export default class TabDemand extends Component {
                     </Content>
 
                 </ScrollView>
+
+                <Fab style={{ backgroundColor: '#DD5453' }} onPress={()=>this.props.navigation.navigate('CsHomeAddStore')}>
+                    <Icon name="add" />
+                </Fab>
+
             </Container>
         )
     }

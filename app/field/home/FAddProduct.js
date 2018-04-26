@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import {
-    Content,
-    Text,
-    Header,
-    Container,
-    Form,
+import { Content, Text, Header, Container, Form,
     Item,
     Input,
     Textarea,
@@ -12,7 +7,7 @@ import {
     Button,
     Body,
     Title,
-    ListItem,
+    ListItem, 
     CheckBox,
     Radio,
     Right,
@@ -21,79 +16,169 @@ import {
     Icon,
     Card,
     CardItem,
-    List
-} from 'native-base';
-import { StyleSheet, View, Image } from 'react-native';
+    List,} from 'native-base';
+import { StyleSheet, View,  Image, PixelRatio, TouchableOpacity, AppRegistry} from 'react-native';
+import axios from 'axios';
+import ImagePicker from 'react-native-image-picker';
 
 import Footer from '../../../components/Footer'
 import Row from '../../../components/Row'
+
+const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
 
 export default class CsAddProduct extends Component {
 
     state = {
         checkedName: "",
+        imageSource: null,
         conditione: false,
         checkedName2: "",
-        selectedName: "",
-        selectedName2: "",
-        items4: [{
+        conditionChoice: "",
+        preOrderChoice: "",
+        value: null,
+        conditionItems: [{
             id: 1,
-            name: "Baru"
+            name: "Baru",
+            value: true
         },
         {
             id: 2,
-            name: "Bekas"
+            name: "Bekas",
+            value: false
         },
         ],
 
-        items5: [{
+        preOrderItems: [{
             id: 1,
-            name: "Ya"
+            name: "Ya",
+            value: true
         },
         {
             id: 2,
-            name: "Tidak"
+            name: "Tidak",
+            value: false
         },
         ],
 
-        productName: "",
-        price: "",
-        request: "",
-        descProduct: "",
-        weight: "",
-        time: "",
-        radio1: "",
-        radio2: ""
+        data: {}
     }
 
-    handleButtonPress() {
-        this.setState({ checkBoxStatus: !this.state.checkBoxStatus });
+    selectPhotoTapped() {
+        const options = {
+          quality: 1.0,
+          maxWidth: 500,
+          maxHeight: 500,
+          storageOptions: {
+            skipBackup: true
+          }
+        };
+    
+        ImagePicker.showImagePicker(options, (response) => {
+          console.log('Response = ', response);
+    
+          if (response.didCancel) {
+            console.log('User cancelled photo picker');
+          }
+          else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          }
+          else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+          }
+          else {
+            let source = { uri: response.uri };
+    
+            // You can also display the image using data:
+            // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+    
+            this.setState({
+  
+              imageSource: source
+  
+            });
+
+            const data = new FormData();
+            data.append("photo", {
+                uri: source.uri,
+                type: "image/jpeg",
+                name: "Photo"
+            });
+            fetch(`${uri}/files/images/logoProduct.png?overwrite=true`, {
+                method: "post",
+                body: data
+            }).then(result => {
+                this.setState({
+                    data: {...this.state.data, image: result.url}
+                })
+            })
+          }
+        });
+      }
+
+    allProduct(){
+        axios.get(`${uri}/data/products?sortBy=created%20desc`).then(result => {
+            this.setState({
+                data: result.data
+            })
+        })
     }
 
-    checkRadio(name, id) {
-        this.setState({
-            selectedName: name,
-            radio1: id
+    handleSubmit(){ 
+        const data = {
+            ...this.state.data, 
+            price: Number(this.state.data.price),
+            weight: Number(this.state.data.weight),
+            processing_days: Number(this.state.data.processing_days)
+        }
+
+        // const dataRelationADS = [
+            //Get objectID from available_delivery_services, then use it in parameter 2 at axios.post avalibale_delivery_services 
+        // ],
+
+        // const dataRelationStores = [
+            //GET objectID from stores, then user it in parameter 2 at axios.post store
+        // ]
+
+        // alert(JSON.stringify(data));
+
+        axios.post(`${uri}/data/products`, data).then(result => {
+            if(result.data){
+                alert("Success!")
+            }
         })
 
-        if (this.state.selectedName == name) {
-            this.setState({
-                selectedName: ""
-            })
-        }
+        //Use this when object dataRelationASD and dataRelationStore is ready
+        // axios.post(`${uri}/data/products`, data).then(result => {
+        //     if(result.data){
+        //         axios.post(`${uri}/data/products/${result.data.objectId}/available_delivery_services:delivery_services:n`).then(result2 => {
+        //             if(result2.data){
+        //                 axios.post(`${uri}/data/products/${result.data.objectId}/store:stores:1`).then(result3 => {
+        //                     if(result3.data){
+        //                         this.allProduct(),
+        //                         alert("Succes!")
+        //                     }
+        //                 })
+        //             }
+        //         })
+        //     }
+        // })
+
     }
 
-    checkRadio2(name, id) {
-        this.setState({
-            selectedName2: name,
-            radio2: id
-        })
 
-        if (this.state.selectedName2 == name) {
-            this.setState({
-                selectedName2: ""
-            })
-        }
+
+    radioCondition(name, is_new){
+        this.setState({
+            conditionChoice: name,
+            data: {...this.state.data, is_new}
+        })
+    }
+
+    preOrderRadio(name, is_preorder){
+        this.setState({
+            preOrderChoice: name,
+            data: {...this.state.data, is_preorder}
+        })
     }
 
     render() {
@@ -117,88 +202,98 @@ export default class CsAddProduct extends Component {
                     />
 
                     <Form>
-                        <View style={{ width: '95%', alignSelf: 'center' }}>
-                            <Label style={styles.batasAtas}>Nama Produk (max 70 karakter)</Label>
+                        <View style={{width: '95%', alignSelf:'center'}}>
+                            <Label style={styles.upperLimit}>Nama Produk (max 70 karakter)</Label>
                             <Item regular>
-                                <Input onChangeText={(text) => this.setState({ productName: text })} />
+                                <Input onChangeText={(name) => this.setState({data: {...this.state.data, name}})}/>
+                            </Item>
+                            
+                            <Label style={styles.upperLimit}>Gambar Produk</Label>
+                            
+                                { this.state.imageSource === null ? (
+                                    <Button transparent onPress={ this.selectPhotoTapped.bind(this)}>
+                                        <Text style={styles.fileChooser}>TAMBAHKAN FOTO</Text>
+                                    </Button>
+                                )
+                                :
+                                (
+                                <View>
+                                    <View>
+                                    <Button transparent onPress={ this.selectPhotoTapped.bind(this)}>
+                                        <Text style={styles.fileChooser}>GANTI FOTO</Text>
+                                    </Button>
+                                    </View>
+                                    <View
+                                        style={[
+                                        styles.avatar,
+                                        styles.avatarContainer,
+                                        { marginBottom: 20 }
+                                        ]}
+                                    >
+                                        <Image style={styles.avatar} source={this.state.imageSource} />
+                                    </View>
+                                </View>
+                                )
+                                }
+                            
+
+                            <Label style={styles.upperLimit}>Harga</Label>
+                            <Item regular>
+                                <Input onChangeText={(price) => this.setState({ data: {...this.state.data, price}})} keyboardType = 'numeric'/>
                             </Item>
 
-                            <Label style={styles.batasAtas}>Gambar Produk</Label>
-                            <Button transparent onPress={() => { alert("Coming Soon") }}>
-                                <Text style={styles.fileChooser}>TAMBAHKAN FILE</Text>
-                            </Button>
-
-                            <Label style={styles.batasAtas}>Harga</Label>
+                            <Label style={styles.upperLimit}>Pemesanan minimun/buah</Label>
                             <Item regular>
-                                <Input onChangeText={(text) => this.setState({ price: text })} />
+                                <Input keyboardType = 'numeric'/>
                             </Item>
 
-                            <Label style={styles.batasAtas}>Pemesanan minimun/buah</Label>
-                            <Item regular>
-                                <Input onChangeText={(text) => this.setState({ request: text })} />
-                            </Item>
-
-                            <Label style={styles.batasAtas}>Kondisi</Label>
-
-                            {this.state.items4.map((item, index) => {
-                                return (
-                                    <ListItem key={item.name} style={styles.iteme}>
-                                        <Radio selected={item.name == this.state.selectedName ? true : false} onPress={() => this.checkRadio(item.name, item.id)} />
+                            <Label style={styles.upperLimit}>Kondisi</Label>
+                            
+                            {this.state.conditionItems.map((item, index)=> {
+                                return(
+                                    <ListItem key={item.name} style={styles.items}>
+                                        <Radio selected = {item.name == this.state.conditionChoice ? true : false} onPress={()=> this.radioCondition(item.name, item.value)} />
                                         <Body>
                                             <Label style={styles.labelSelect}>{item.name}</Label>
                                         </Body>
                                     </ListItem>
                                 )
-                            })}
+                            } )}
 
-                            <Label style={styles.batasAtas}>Deskripsi Produk</Label>
+                            <Label style={styles.upperLimit}>Deskripsi Produk</Label>
                             <Item regular>
-                                <Input onChangeText={(text) => this.setState({ descProduct: text })} />
+                                <Input onChangeText={(description) => this.setState({data: {...this.state.data, description}})}/>
                             </Item>
 
-                            <Label style={styles.batasAtas}>Berat (kg)</Label>
+                            <Label style={styles.upperLimit}>Berat (kg)</Label>
                             <Item regular>
-                                <Input onChangeText={(text) => this.setState({ weight: text })} />
+                                <Input onChangeText={(weight) => this.setState({data: {...this.state.data, weight}})} keyboardType = 'numeric'/>
                             </Item>
 
-                            <Label style={styles.batasAtas}>Aktifkan preorder untuk waktu proses produksi yang lebih lama</Label>
+                            <Label style={styles.upperLimit}>Aktifkan preorder untuk waktu proses produksi yang lebih lama</Label>
 
-                            {this.state.items5.map((item, index) => {
-                                return (
-                                    <ListItem key={item.name} style={styles.iteme}>
-                                        <Radio selected={item.name == this.state.selectedName2 ? true : false} onPress={() => this.checkRadio2(item.name, item.id)} />
+                            {this.state.preOrderItems.map((item, index)=> {
+                                return(
+                                    <ListItem key={item.name} style={styles.items}>
+                                        <Radio selected = {item.name == this.state.preOrderChoice ? true : false} onPress={()=> this.preOrderRadio(item.name, item.value)} />
                                         <Body>
                                             <Label style={styles.labelSelect}>{item.name}</Label>
                                         </Body>
                                     </ListItem>
                                 )
-                            })}
+                            } )}
 
-                            <Label style={styles.batasAtas}>Waktu Proses (wajib diisi untuk mengetahui lama produk diproses)</Label>
+                            <Label style={styles.upperLimit}>Waktu Proses (wajib diisi untuk mengetahui lama produk diproses)</Label>
                             <Item regular>
-                                <Input onChangeText={(text) => this.setState({ time: text })} />
+                                <Input onChangeText={(processing_days) => this.setState({data: {...this.state.data, processing_days}})} keyboardType = 'numeric'/>
                             </Item>
                         </View>
 
-                        <View style={{margin:20}}>
-                            <Button full style={styles.buttone} onPress={() => this.props.navigation.navigate('FieldHomeDemandViewPassing', {
-                                data: {
-                                    productName: this.state.productName,
-                                    price: this.state.price,
-                                    request: this.state.request,
-                                    descProduct: this.state.descProduct,
-                                    weight: this.state.weight,
-                                    time: this.state.time,
-                                    radio1: this.state.radio1,
-                                    radio2: this.state.radio2
-                                }
-                            })}>
-
+                        <ListItem style={{alignSelf:'center', justifyContent:'center'}}>
+                            <Button block style={styles.submitBtn} onPress={()=> this.handleSubmit()}>
                                 <Text>Submit</Text>
                             </Button>
-                            
-                        </View>
-
+                        </ListItem>
                     </Form>
                 </Content>
 

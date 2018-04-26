@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native'
-import { Container,TabHeading, Header, Title, Content, Badge, Tab, Tabs, ScrollableTab, Text, Button, Icon, View, list, listItem, Body } from 'native-base';
+import { Container, TabHeading, Header, Title, Content, Badge, Tab, Tabs, ScrollableTab, Text, Button, Icon, View, list, listItem, Body } from 'native-base';
 
-import {TabRequestsend, TabFailed,TabProcess,TabSuccess} from './tab/Main'
+import { TabRequestsend, TabFailed, TabProcess, TabSuccess } from './tab/Main'
 
 import Footer from '../../../components/Footer'
 
@@ -10,12 +10,12 @@ import Footer from '../../../components/Footer'
 export default class Main extends Component {
 
     state = {
-        notification:{
+        notification: {
             transaction: {
-                send : 1,
-                process : 9,
-                success : 3,
-                failed :3
+                send: 1,
+                process: 9,
+                success: 3,
+                failed: 3
             }
         }
     }
@@ -32,7 +32,7 @@ export default class Main extends Component {
                             </Badge>
                         </TabHeading>
                     )}>
-                        <TabRequestsend navigation={this.props.navigation}/>
+                        <TabRequestsend navigation={this.props.navigation} />
                     </Tab>
                     <Tab heading={(
                         <TabHeading>
@@ -42,9 +42,20 @@ export default class Main extends Component {
                             </Badge>
                         </TabHeading>
                     )}>
-                        <TabProcess navigation={this.props.navigation}/>
+                        <TabProcess navigation={this.props.navigation} />
                     </Tab>
-                    
+
+                    <Tab heading={(
+                        <TabHeading>
+                            <Text>Sukses</Text>
+                            <Badge style={styles.badge}>
+                                <Text style={styles.badgeText}>{this.state.notification.transaction.success}</Text>
+                            </Badge>
+                        </TabHeading>
+                    )}>
+                        <TabSuccess navigation={this.props.navigation} />
+                    </Tab>
+
                     <Tab heading={(
                         <TabHeading>
                             <Text>Gagal</Text>
@@ -53,19 +64,10 @@ export default class Main extends Component {
                             </Badge>
                         </TabHeading>
                     )}>
-                        <TabFailed navigation={this.props.navigation}/>
+                        <TabFailed navigation={this.props.navigation} />
                     </Tab>
 
-                    <Tab heading={(
-                        <TabHeading>
-                            <Text>Selesai</Text>
-                            <Badge style={styles.badge}>
-                                <Text style={styles.badgeText}>{this.state.notification.transaction.success}</Text>
-                            </Badge>
-                        </TabHeading>
-                    )}>
-                        <TabSuccess navigation={this.props.navigation}/>
-                    </Tab>
+
                 </Tabs>
 
                 <Footer data={
@@ -82,9 +84,9 @@ export default class Main extends Component {
 
 const styles = StyleSheet.create({
     badge: {
-        backgroundColor:'white'
+        backgroundColor: 'white'
     },
-    badgeText :{
-        color:'#DD5453'
+    badgeText: {
+        color: '#DD5453'
     }
 })

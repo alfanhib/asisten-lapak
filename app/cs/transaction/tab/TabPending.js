@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Image, Text, StyleSheet, View, ScrollView, RefreshControl } from 'react-native'
-import { Container, Content } from 'native-base'
+import { Container, Content, Fab, Icon, Spinner } from 'native-base'
 
 import axios from 'axios'
 import moment from 'moment'
@@ -8,7 +8,7 @@ import config from '../../../../config'
 
 import Row from '../../../../components/Row'
 
-export default class TabProcess extends Component {
+export default class TabPending extends Component {
 
     state = {
         refreshing: true,
@@ -17,7 +17,7 @@ export default class TabProcess extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
-        axios.get(`${config.uri}/data/transactions?where=status%20%3D%20'process'&props=name%2Caddress%2Ccreated&loadRelations=typeOfShipping`).then((transactions) => {
+        axios.get(`${config.uri}/data/transactions?where=status%20%3D%20'pending'&props=name%2Caddress%2Ccreated&loadRelations=typeOfShipping`).then((transactions) => {
             this.setState({ transactions: transactions.data, refreshing: false })
         })
     }
@@ -75,6 +75,12 @@ export default class TabProcess extends Component {
                         })}
                     </Content>
                 </ScrollView>
+
+
+
+                <Fab style={{ backgroundColor: '#DD5453' }} onPress={()=>this.props.navigation.navigate('CsTransactionAdd')}>
+                    <Icon name="add" />
+                </Fab>
 
             </Container>
         )

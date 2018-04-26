@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Image, Text, StyleSheet, View, ScrollView, RefreshControl } from 'react-native'
-import { Container, Content, Fab, Icon, Spinner } from 'native-base'
+import { Container, Content} from 'native-base'
 
 import axios from 'axios'
 import moment from 'moment'
@@ -75,12 +75,6 @@ export default class TabFailed extends Component {
                         })}
                     </Content>
                 </ScrollView>
-
-
-
-                <Fab style={{ backgroundColor: '#DD5453' }} onPress={this.props.fab}>
-                    <Icon name="add" />
-                </Fab>
 
             </Container>
         )

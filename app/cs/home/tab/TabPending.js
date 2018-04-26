@@ -7,7 +7,7 @@ import config from '../../../../config'
 
 import Row from '../../../../components/Row'
 
-export default class TabDemand extends Component {
+export default class TabPending extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
