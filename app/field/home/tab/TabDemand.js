@@ -72,11 +72,6 @@ export default class TabDemand extends Component {
                     </Content>
 
                 </ScrollView>
-
-                <Fab style={{ backgroundColor: '#DD5453' }} onPress={()=>this.props.navigation.navigate('FieldHomeAddStore')}>
-                    <Icon name="add" />
-                </Fab>
-
             </Container>
         )
     }
