@@ -23,7 +23,6 @@ import {
   ListItem,
   Label,
   Button,
-  Footer,
   Body,
   Title,
   Right,
