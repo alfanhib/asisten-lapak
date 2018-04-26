@@ -1,83 +1,37 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, View, ScrollView, RefreshControl } from 'react-native'
-import { Container, Title, Content, Text, Icon, Fab, Spinner } from 'native-base';
+import { StyleSheet } from 'react-native'
+import { Container, TabHeading,Badge, Header, Title, Content, Tab, Tabs, Text, FooterTab, Button, Icon, View, list, listItem, Body } from 'native-base';
 
-import axios from 'axios'
-
+import { TabActive, TabPending } from './tab/Main'
 import Footer from '../../../components/Footer'
-import Row from '../../../components/Row'
-import config from '../../../config'
 
 
 export default class Main extends Component {
-
-    state = {
-        refreshing: true,
-        stores: []
-    }
-
-
-    componentDidMount() {
-        this.setState({ refreshing: true });
-        axios.get(`${config.uri}/data/stores?props=name%2Caddress%2Clogo&loadRelations=assistant`).then((stores) => {
-            this.setState({ stores: stores.data, refreshing: false })
-        })
-    }
-
     render() {
         return (
             <Container>
-
-
-                <ScrollView
-                    style={{ backgroundColor: 'white' }}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={this.componentDidMount.bind(this)}
-                        />
-                    }
-                >
-
-                    <Content>
-
-                        {(this.state.loading == false) && (this.state.stores.length) == 0 ? (
-                            <Text style={{ textAlign: 'center', marginTop: 10 }}>No data</Text>
-                        ) : null}
-
-                        {this.state.stores.map((store, indexes) => (
-                            <Row
-                                body={(
-                                    <View style={{ flexDirection: 'row', paddingLeft: 20, paddingRight: 20 }}>
-                                        <Image style={styles.rowImage}
-                                            source={{ uri: store.logo }}
-                                        />
-                                        <View style={{ flex: 6, paddingLeft: 10 }}>
-                                            <Text style={styles.rowTextTitle}>{store.name}</Text>
-                                            <Text style={styles.rowTextAsist}>Asisten Lapangan</Text>
-                                            <Text style={styles.rowTextAsistName}>{store.assistant.name}</Text>
-                                            <Text style={styles.rowTextAddress}>{store.address}</Text>
-                                        </View>
-                                    </View>
-                                )
-                                }
-                                onpress={{
-                                    view: () => alert('test bro')
-                                }}
-                                key={indexes}
-                            />
-                        ))}
-
-                    </Content>
-
-                </ScrollView>
-
-
-
-                <Fab style={{ bottom: 60, backgroundColor: '#DD5453' }}
-                    onPress={() => this.props.navigation.navigate('CsHomeAddStore')}>
-                    <Icon name="add" />
-                </Fab>
+                <Tabs locked={true} initialPage={0}>
+                    <Tab heading={(
+                        <TabHeading>
+                            <Text>Aktif</Text>
+                            <Badge style={styles.badge}>
+                                <Text style={styles.badgeText}>10</Text>
+                            </Badge>
+                        </TabHeading>
+                    )}>
+                        <TabActive navigation={this.props.navigation}/>
+                    </Tab>
+                    <Tab heading={(
+                        <TabHeading>
+                            <Text>Pending</Text>
+                            <Badge style={styles.badge}>
+                                <Text style={styles.badgeText}>10</Text>
+                            </Badge>
+                        </TabHeading>
+                    )}>
+                        <TabPending navigation={this.props.navigation} />
+                    </Tab>
+                </Tabs>
 
                 <Footer data={
                     {
@@ -86,37 +40,16 @@ export default class Main extends Component {
                         screenSettings: () => this.props.navigation.navigate('CsSettings'),
                     }
                 } />
-
             </Container>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    rowImage: {
-        resizeMode: 'contain',
-        flex: 2
+    badge: {
+        backgroundColor: 'white'
     },
-    rowTextTitle: {
-        fontSize: 20,
-        marginBottom: 5,
-        alignSelf: 'flex-start'
-    },
-    rowTextAsist: {
-        fontSize: 13,
-        color: '#828282',
-        alignSelf: 'flex-start'
-    },
-    rowTextAsistName: {
-        fontSize: 15,
-        marginBottom: 5,
-        color: '#4c4c4c',
-        alignSelf: 'flex-start'
-    },
-    rowTextAddress: {
-        fontSize: 15,
-        color: '#4c4c4c',
-        alignSelf: 'flex-start'
+    badgeText: {
+        color: '#DD5453'
     }
-
 })
