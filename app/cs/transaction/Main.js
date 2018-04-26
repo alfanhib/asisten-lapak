@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native'
-import { Container, Header, Title, Content, Tab, Tabs, Text, Body, Badge, TabHeading } from 'native-base';
-
-import { TabProcess, TabFailed, TabSuccess } from './tab/Main'
+import { Container, Header, Title, Content, Tab, Tabs, Text, Body, Badge, TabHeading, ScrollableTab } from 'native-base';
+import { TabPending, TabProcess, TabFailed, TabSuccess } from './tab/Main'
 import Footer from '../../../components/Footer'
 
 
@@ -11,6 +10,7 @@ export default class Main extends Component {
     state = {
         notification : {
             transaction :{
+                pending :10,
                 process : 92,
                 success : 23,
                 failed : 1
@@ -21,8 +21,19 @@ export default class Main extends Component {
     render() {
         return (
             <Container>
-                <Tabs locked={true} initialPage={0}>
+                <Tabs locked={true} renderTabBar={() => <ScrollableTab />}>
                     <Tab heading={(
+                        <TabHeading>
+                            <Text>Pending</Text>
+                            <Badge style={styles.badge}>
+                                <Text style={styles.badgeText}>{this.state.notification.transaction.pending}</Text>
+                            </Badge>
+                        </TabHeading>
+                    )}>
+                        <TabPending  navigation={this.props.navigation} />
+                    </Tab>
+
+                     <Tab heading={(
                         <TabHeading>
                             <Text>Proses</Text>
                             <Badge style={styles.badge}>
@@ -30,8 +41,9 @@ export default class Main extends Component {
                             </Badge>
                         </TabHeading>
                     )}>
-                        <TabProcess fab={()=>this.props.navigation.navigate('CsTransactionAdd')} />
+                        <TabProcess/>
                     </Tab>
+
                     <Tab heading={(
                         <TabHeading>
                             <Text>Sukses</Text>
