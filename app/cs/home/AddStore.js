@@ -1,20 +1,9 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  StatusBar,
-  NativeModules,
-  Alert,
-  PixelRatio,
-  Image
-} from "react-native";
+import { StyleSheet, View, PixelRatio, Image } from "react-native";
 import {
   Content,
-  Header,
   Form,
   Item,
-  FooterTab,
   Text,
   Container,
   Input,
@@ -23,9 +12,7 @@ import {
   ListItem,
   Label,
   Button,
-  Footer,
   Body,
-  Title,
   Right,
   Left,
   Picker,
@@ -38,10 +25,7 @@ import axios from "axios";
 import Modal from "react-native-modal";
 import ImagePicker from "react-native-image-picker";
 
-import Footer from "../../../components/Footer";
-
-const uri =
-  "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
+import config from "../../../config";
 
 export default class CsAddStore extends Component {
   state = {
@@ -204,10 +188,6 @@ export default class CsAddStore extends Component {
         console.log("User tapped custom button: ", response.customButton);
       } else {
         let source = { uri: response.uri };
-
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-
         this.setState({
           imageSource: source
         });
@@ -218,7 +198,7 @@ export default class CsAddStore extends Component {
           type: "image/jpeg",
           name: "Photo"
         });
-        fetch(`${uri}/files/images/logoToko.png?overwrite=true`, {
+        fetch(`${config.uri}/files/images/logoToko.png?overwrite=true`, {
           method: "post",
           body: data
         }).then(result => {
@@ -275,7 +255,9 @@ export default class CsAddStore extends Component {
   allDeliveryServices() {
     axios
       .get(
-        `${uri}/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`
+        `${
+          config.uri
+        }/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`
       )
       .then(result => {
         this.setState({
@@ -285,36 +267,34 @@ export default class CsAddStore extends Component {
   }
 
   getAllUser() {
-    axios.get(`${uri}/data/Users`).then(result => {
+    axios.get(`${config.uri}/data/Users`).then(result => {
       console.log(result.data);
       this.setState({ users: result.data });
     });
   }
 
   handleSubmit() {
-    const assistantRelation = [
-      //GET objectID from user login
-      //For Example:
-      //// "AFCD2A0E-3C7C-093E-FFB4-16C27896D200"
-    ];
+    const userAssistant = [this.state.userObjectId];
 
-    axios.post(`${uri}/data/stores`, this.state.data).then(result => {
+    //post data ke API
+    axios.post(`${config.uri}/data/stores`, this.state.data).then(result => {
       if (result.data) {
-        alert("Succes!");
+        axios
+          .post(
+            `${config.uri}/data/stores/${
+              result.data.objectId
+            }/assistant:Users:1`,
+            userAssistant
+          )
+          .then(resultRelation => {
+            //set state to return result.data and emptying field title
+            this.setState({
+              data: resultRelation.data
+            });
+          });
+        this.props.navigation.goBack();
       }
     });
-
-    //Use this if yout assistant object id is ready
-    // axios.post(`${uri}/data/stores`, this.state.data).then(result => {
-    //     if(result.data){
-
-    //         axios.post(`${uri}/data/stores/${result.data.objectId}/assistant:Users:1`, assistantRelation).then(result2 => {
-    //             if(result2.data){
-    //                 alert("Success!")
-    //             }
-    //         })
-    //     }
-    // })
   }
 
   componentDidMount() {
@@ -325,14 +305,6 @@ export default class CsAddStore extends Component {
   render() {
     return (
       <Container>
-        <Header
-          style={{ backgroundColor: "#dd5453" }}
-          androidStatusBarColor="#b4424b"
-        >
-          <Body>
-            <Title>Tambah Lapak</Title>
-          </Body>
-        </Header>
         <Content padder>
           <Form>
             <Label style={styles.upperLimit}>Nama Asisten Lapak </Label>
@@ -589,31 +561,11 @@ export default class CsAddStore extends Component {
               );
             })}
 
-            <ListItem style={{ alignSelf: "center", justifyContent: "center" }}>
-              <Button
-                block
-                style={styles.submitBtn}
-                onPress={() => this.handleSubmit()}
-              >
-                <Text>Submit</Text>
-              </Button>
-            </ListItem>
+            <Button style={styles.button} onPress={() => this.handleSubmit()}>
+              <Text>Submit</Text>
+            </Button>
           </Form>
         </Content>
-
-        <Footer style={styles.mainColor}>
-          <FooterTab style={styles.mainColor}>
-            <Button>
-              <Icon name="home" />
-            </Button>
-            <Button>
-              <Icon name="cart" />
-            </Button>
-            <Button>
-              <Icon name="settings" />
-            </Button>
-          </FooterTab>
-        </Footer>
       </Container>
     );
   }
@@ -650,6 +602,14 @@ const styles = StyleSheet.create({
     marginLeft: -15
   },
 
+  button: {
+    margin: 10,
+    width: "60%",
+    backgroundColor: "#b4424b",
+    alignSelf: "center",
+    justifyContent: "center"
+  },
+
   mainColor: {
     backgroundColor: "#dd5453"
   },
@@ -666,5 +626,15 @@ const styles = StyleSheet.create({
     height: 150,
     justifyContent: "center",
     alignItems: "center"
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 2,
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)"
+  },
+  bottomModal: {
+    justifyContent: "flex-end",
+    margin: 0
   }
 });
