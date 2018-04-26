@@ -63,7 +63,7 @@ export default class TabActive extends Component {
                                 )
                                 }
                                 onpress={{
-                                    view: () => alert('test bro')
+                                    view: () => alert('test brroooooooo')
                                 }}
                                 key={indexes}
                             />
