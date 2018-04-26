@@ -6,7 +6,7 @@ import { StackNavigator } from 'react-navigation'
 import SignIn from './app/SignIn'
 import SignUp from './app/SignUp'
 
-// import Loader from './app/Loader'kk
+// import Loader from './app/Loader'
 
 import CsHome from './app/cs/home/Main'
 import CsHomeAddStore from './app/cs/home/AddStore'
