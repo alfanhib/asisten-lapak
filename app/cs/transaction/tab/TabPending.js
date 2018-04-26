@@ -17,7 +17,7 @@ export default class TabPending extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
-        axios.get(`${config.uri}/data/transactions?where=status%20%3D%20'process'&props=name%2Caddress%2Ccreated&loadRelations=typeOfShipping`).then((transactions) => {
+        axios.get(`${config.uri}/data/transactions?where=status%20%3D%20'pending'&props=name%2Caddress%2Ccreated&loadRelations=typeOfShipping`).then((transactions) => {
             this.setState({ transactions: transactions.data, refreshing: false })
         })
     }
