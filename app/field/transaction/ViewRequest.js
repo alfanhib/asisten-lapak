@@ -1,7 +1,17 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Image } from "react-native";
-import { Container, Content, Text, Button } from "native-base";
+import { StyleSheet, View, Image, FlatList } from "react-native";
+import {
+  Container,
+  Content,
+  Text,
+  Button,
+  List,
+  ListItem,
+  Thumbnail,
+  Body
+} from "native-base";
 import axios from "axios";
+import moment from "moment";
 
 import config from "../../../config";
 import Footer from "../../../components/Footer";
@@ -29,10 +39,13 @@ export default class ViewRequest extends Component {
   }
 
   render() {
+    const { item } = this.props.navigation.state.params;
     return (
       <Container>
         <Content style={{ backgroundColor: "#f9f9f9" }}>
-          <Text style={styles.info}>Batas Akhir 21 Maret 2018</Text>
+          <Text style={styles.info}>
+            Batas Akhir {moment(item.deadlineDate).format("L")}
+          </Text>
 
           <Row
             body={
@@ -42,14 +55,16 @@ export default class ViewRequest extends Component {
                   source={require("../../../assets/images/market.png")}
                 />
                 <View style={{ flex: 5, paddingLeft: 10 }}>
-                  <Text style={styles.rowTextTitle}>Els Komputer</Text>
-                  <Text style={styles.rowTextAddress}>
-                    JL DI Panjaitan No 128 Purwokerto
-                  </Text>
+                  <Text style={styles.rowTextTitle}>{item.name}</Text>
+                  <Text style={styles.rowTextAddress}>{item.address}</Text>
                   <Text style={styles.rowTextIn}>Masuk</Text>
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={styles.rowTextDate}>21 Maret 2018</Text>
-                    <Text style={styles.rowTextSender}>JNE</Text>
+                    <Text style={styles.rowTextDate}>
+                      {moment(item.created).format("L")}
+                    </Text>
+                    <Text style={styles.rowTextSender}>
+                      {item.typeOfShipping.name}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -58,26 +73,21 @@ export default class ViewRequest extends Component {
 
           <Text style={styles.info}>Daftar Barang</Text>
 
-          <Row
-            body={
-              <View style={{ flexDirection: "row", padding: 10 }}>
-                <Image
-                  style={styles.rowImage}
-                  source={{ uri: this.state.listProducts[1].image }}
-                />
-                <View style={{ flex: 5, paddingLeft: 10 }}>
-                  <Text style={styles.rowTextTitle}>
-                    {this.state.listProducts[1].name}
-                  </Text>
-                  <Text style={styles.rowTextPcs}>3pcs</Text>
-                  <Text style={styles.rowTextPrice}>
-                    Rp. {this.state.listProducts[1].price}
-                  </Text>
-                </View>
-              </View>
-            }
-          />
-
+          <List>
+            <FlatList
+              data={this.state.listProducts}
+              keyExtractor={item => item.objectId}
+              renderItem={({ item }) => (
+                <ListItem>
+                  <Thumbnail circular size={50} source={{ uri: item.image }} />
+                  <Body>
+                    <Text>{item.name}</Text>
+                    <Text note>{item.price}</Text>
+                  </Body>
+                </ListItem>
+              )}
+            />
+          </List>
           <View style={{ flexDirection: "row", margin: 15 }}>
             <View style={{ flex: 1 }}>
               <Text>Total</Text>
