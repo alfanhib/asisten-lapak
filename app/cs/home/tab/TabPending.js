@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Image, ScrollView, RefreshControl } from "react-native";
+import { StyleSheet, Image, ScrollView, RefreshControl,AsyncStorage } from "react-native";
 import { Container, Content, Fab, Icon, Text, View } from "native-base";
 
 import axios from "axios";
@@ -8,18 +8,18 @@ import config from "../../../../config";
 import Row from "../../../../components/Row";
 
 export default class TabPending extends Component {
+
   getAllData() {
-    this.setState({ refreshing: true });
-    axios
-      .get(
-        `${
-          config.uri
-        }/data/stores?where=status%3D'pending'&props=name%2Caddress%2Clogo&loadRelations=assistant&sortBy=created%20desc`
-      )
-      .then(stores => {
-        this.setState({ stores: stores.data, refreshing: false });
-      });
-  }
+        this.setState({ refreshing: true });
+        AsyncStorage.getItem("objectId", (err, result) => {
+            if (result) {
+                axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_cs.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_outdoor`)
+                    .then(stores => {
+                        this.setState({ stores: stores.data, refreshing: false });
+                    });
+            }
+        });
+    }
 
   componentDidMount() {
     this.getAllData();
@@ -67,9 +67,9 @@ export default class TabPending extends Component {
                     />
                     <View style={{ flex: 6, paddingLeft: 10 }}>
                       <Text style={styles.rowTextTitle}>{store.name}</Text>
-                      <Text style={styles.rowTextAsist}>Asisten CS</Text>
+                      <Text style={styles.rowTextAsist}>Asisten Lapangan</Text>
                       <Text style={styles.rowTextAsistName}>
-                        {store.assistant.name}
+                        {store.assistant_outdoor.name}
                       </Text>
                       <Text style={styles.rowTextAddress}>{store.address}</Text>
                     </View>

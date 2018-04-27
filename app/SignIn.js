@@ -1,36 +1,30 @@
 import React, { Component } from "react";
 import {
-  StyleSheet,
-  View,
-  Image,
+  StyleSheet,View,Image,
   KeyboardAvoidingView,
   AsyncStorage
 } from "react-native";
+
 import {
-  Container,
-  Content,
-  Text,
-  Item,
-  Form,
-  Input,
-  Icon,
-  Button,
-  Header
+  Container,Content,Text,
+  Item,Form,Input,
+  Icon,Button,Header,Spinner
 } from "native-base";
 import axios from "axios";
+import ValidationComponent from 'react-native-form-validator'
 
 import config from "../config";
 
 export default class SignIn extends Component {
   state = {
-    form: []
+    form: [],
+    loading: false
   };
 
   componentDidMount() {
     AsyncStorage.multiGet(["userToken", "role"], (err, result) => {
-      //   alert(JSON.stringify(result));
       if (result[0][1]) {
-        if (result[1][1] == "lapangan") {
+        if (result[1][1] == "outdoor") {
           this.props.navigation.navigate("FieldHome");
         } else if (result[1][1] == "cs") {
           this.props.navigation.navigate("CsHome");
@@ -40,6 +34,11 @@ export default class SignIn extends Component {
   }
 
   handleSignIn() {
+
+    this.setState({
+      loading:true
+    })
+
     axios
       .post(`${config.uri}/users/login`, this.state.form)
       .then(result => {
@@ -48,13 +47,21 @@ export default class SignIn extends Component {
           ["objectId", result.data.objectId],
           ["role", result.data.role]
         ]);
-        if (result.data.role === "lapangan") {
+        if (result.data.role === "outdoor") {
           this.props.navigation.navigate("FieldHome");
         } else if (result.data.role === "cs") {
           this.props.navigation.navigate("CsHome");
         }
+        this.setState({
+          loading:false
+        })
       })
-      .catch(e => alert(e));
+      .catch((e)=>{
+          alert(e.response.data.message)
+          this.setState({
+            loading:false
+          })
+      })
   }
 
   render() {
@@ -74,7 +81,6 @@ export default class SignIn extends Component {
                 <Input
                   placeholder="Email"
                   keyboardType="email-address"
-                  onSubmitEditing={() => this.passwordInput.focus()}
                   onChangeText={login =>
                     this.setState({ form: { ...this.state.form, login } })
                   }
@@ -90,13 +96,18 @@ export default class SignIn extends Component {
                   }
                 />
               </Item>
-              <Button
+              
+              {this.state.loading == true ? (<Spinner color='red'/>):null}
+              {this.state.loading == false ?(
+                <Button
                 full
                 style={styles.btnLogin}
                 onPress={() => this.handleSignIn()}
-              >
+                >
                 <Text style={{ color: "#fff" }}>Login</Text>
               </Button>
+              ):null}
+
               <Button
                 transparent
                 full
