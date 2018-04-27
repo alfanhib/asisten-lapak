@@ -11,7 +11,7 @@ export default class TabDemand extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
-        axios.get(`${config.uri}/data/stores?props=name%2Caddress%2Clogo&loadRelations=assistant`).then((stores) => {
+        axios.get(`${config.uri}/data/stores?where=status%20%3D%20'pending'&props=name%2Caddress%2Clogo&loadRelations=assistant`).then((stores) => {
             this.setState({ stores: stores.data, refreshing: false })
         })
     }
