@@ -56,7 +56,7 @@ export default class AddTransaction extends Component{
     }
 
     allDeliveryServices(){
-        axios.get(`${uri}/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`).then(result => {
+        axios.get(`${config.uri}/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`).then(result => {
             this.setState({
                 deliveryServices: result.data
             })
@@ -74,9 +74,9 @@ export default class AddTransaction extends Component{
             this.state.finalDS
         ]
 
-        axios.post(`${uri}/transactions`, this.state.data).then(result => {
+        axios.post(`${config.uri}/transactions`, this.state.data).then(result => {
             if(result.data){
-                axios.post(`${uri}/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result2 => {
+                axios.post(`${config.uri}/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result2 => {
                     alert("Success")
                 })  
             }
@@ -206,11 +206,12 @@ export default class AddTransaction extends Component{
 }
 
 const styles = StyleSheet.create({
-    buttone:{
-        backgroundColor: "#DD5453"
+    submitBtn:{
+        backgroundColor: "#b4424b",
+        flex: 1
     },
 
-    batasAtas:{
+    upperLimit:{
         marginTop: 10
     },
 
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
         marginLeft: 55
     },
 
-    iteme:{
+    items:{
         marginLeft: -0.1
     },
 
@@ -239,3 +240,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#dd5453'
     }
 })
+

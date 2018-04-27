@@ -24,6 +24,7 @@ import {
 import { StyleSheet, View, TouchableOpacity, StatusBar, Image, PixelRatio, AppRegistry } from 'react-native';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
+import Modal from "react-native-modal";
 
 const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
 
@@ -214,7 +215,7 @@ export default class CsAddStore extends Component {
     
         ImagePicker.showImagePicker(options, (response) => {
           console.log('Response = ', response);
-    
+            fileName:
           if (response.didCancel) {
             console.log('User cancelled photo picker');
           }
@@ -226,7 +227,7 @@ export default class CsAddStore extends Component {
           }
           else {
             let source = { uri: response.uri };
-    
+            
             // You can also display the image using data:
             // let source = { uri: 'data:image/jpeg;base64,' + response.data };
     
@@ -242,7 +243,7 @@ export default class CsAddStore extends Component {
                 type: "image/jpeg",
                 name: "Photo"
             });
-            fetch(`${uri}/files/images/logoToko.png?overwrite=true`, {
+            fetch(`${config.uri}/files/images/logoToko.png?overwrite=true`, {
                 method: "post",
                 body: data
             }).then(result => {
@@ -305,7 +306,7 @@ export default class CsAddStore extends Component {
       }
 
       allDeliveryServices(){
-          axios.get(`${uri}/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`).then(result => {
+          axios.get(`${config.uri}/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`).then(result => {
               this.setState({
                   deliveryServices: result.data
               })
@@ -326,10 +327,10 @@ export default class CsAddStore extends Component {
         // })
 
         //Use this if yout assistant object id is ready
-        axios.post(`${uri}/data/stores`, this.state.data).then(result => {
+        axios.post(`${config.uri}/data/stores`, this.state.data).then(result => {
             if(result.data){
 
-                axios.post(`${uri}/data/stores/${result.data.objectId}/assistant:Users:1`, assistantRelation).then(result2 => {
+                axios.post(`${config.uri}/data/stores/${result.data.objectId}/assistant:Users:1`, assistantRelation).then(result2 => {
                     if(result2.data){
                         alert("Success!")
                     }
@@ -339,7 +340,10 @@ export default class CsAddStore extends Component {
     }
 
     componentDidMount(){
-        this.allDeliveryServices()
+        this.allDeliveryServices(),
+        this.setState({
+            data: {...this.state.data, status: "Pending"}
+        })
     }
 
     render() {
@@ -347,6 +351,59 @@ export default class CsAddStore extends Component {
             <Container>
                 <Content padder>
                     <Form>
+                        <Label style={styles.upperLimit}>Nama Asisten Lapak </Label>
+                        <List>
+                            <ListItem onPress={() => this.setState({ visibleModal: true })}>
+                                <Body>
+                                {this.state.selectedName === null ? (
+                                    <Text>Please Select Assistant</Text>
+                                ) : (
+                                    <Text>{this.state.selectedName}</Text>
+                                )}
+                                </Body>
+                                <Right>
+                                <Icon name="arrow-dropdown" />
+                                </Right>
+                            </ListItem>
+                        </List>
+                        <Modal isVisible={this.state.visibleModal}>
+                            <View style={styles.modalContent}>
+                                <List>
+                                {this.state.users.map(user => {
+                                    return (
+                                    <ListItem
+                                        key={user.objectId}
+                                        onPress={() =>
+                                        this.setState({
+                                            selectedName: user.name,
+                                            userObjectId: user.objectId,
+                                            visibleModal: false
+                                        })
+                                        }
+                                    >
+                                        <Thumbnail
+                                        square
+                                        size={5}
+                                        source={{ uri: user.photo }}
+                                        style={{ marginRight: 20 }}
+                                        />
+                                        <Body>
+                                        <Text>{user.name}</Text>
+                                        <Text note>{user.email}</Text>
+                                        <Text note>{user.mobile_phone}</Text>
+                                        </Body>
+                                    </ListItem>
+                                    );
+                                })}
+                                </List>
+                                <Button
+                                style={styles.button}
+                                onPress={() => this.setState({ visibleModal: false })}
+                                >
+                                <Text>Close</Text>
+                                </Button>
+                            </View>
+                        </Modal>
                         <Label>Nama Toko</Label>
                         <Item regular>
                             <Input onChangeText={(name) => this.setState({data: {...this.state.data, name}})} />
@@ -495,36 +552,51 @@ export default class CsAddStore extends Component {
 }
 
 const styles = StyleSheet.create({
-    buttone: {
-        backgroundColor: "#DD5453"
+    submitBtn:{
+        flex: 1,
+        backgroundColor: "#b4424b"
     },
 
-    batasAtas: {
+    upperLimit:{
         marginTop: 10
     },
 
-    labelBtn: {
+    labelBtn:{
         marginLeft: 55
     },
 
-    labelSelect: {
+    labelSelect:{
         marginLeft: 20
     },
 
-    label: {
+    label:{
         margin: 20
     },
 
-    iteme: {
+    items:{
         marginLeft: -0.1
     },
 
-    fileChooser: {
+    fileChooser:{
         color: '#156af2',
-        marginLeft: -17
+        marginLeft: -15
     },
 
-    mainColor: {
+    mainColor:{
         backgroundColor: '#dd5453'
+    },
+
+    avatarContainer: {
+        borderColor: "#9B9B9B",
+        borderWidth: 1 / PixelRatio.get(),
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    avatar: {
+        borderRadius: 75,
+        width: 150,
+        height: 150,
+        justifyContent: "center",
+        alignItems: "center"
     }
 })

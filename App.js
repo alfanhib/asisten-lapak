@@ -114,7 +114,7 @@ const App = StackNavigator(
     FieldHomeAddProduct: {
       screen: FieldHomeAddProduct,
       navigationOptions: {
-        title: "Field Home",
+        title: "Add Product",
         headerStyle: styles.header,
         headerTintColor: "#fff"
       }
@@ -130,7 +130,7 @@ const App = StackNavigator(
     FieldHomeProductList: {
       screen: FieldHomeProductList,
       navigationOptions: {
-        title: "Add Product",
+        title: "Detail Store",
         headerStyle: styles.header,
         headerTintColor: "#fff"
       }
