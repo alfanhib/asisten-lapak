@@ -4,6 +4,7 @@ import {Container, Content, Text, Item, Form, Input, Icon, Button, Header} from 
 import axios from 'axios'
 
 import config from '../config'
+import ValidationComponent from 'react-native-form-validator'
 
 export default class SignIn extends Component{
 
