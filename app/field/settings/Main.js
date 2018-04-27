@@ -1,64 +1,42 @@
 import React, { Component } from "react";
-import { StyleSheet, AsyncStorage} from "react-native";
+import { StyleSheet, AsyncStorage } from "react-native";
 import {
-  Container,
-  Header,
-  Title,
   Content,
-  Text,
-  Footer,
-  FooterTab,
-  Button,
-  Icon,
-  View,
-  Body,
+  Container,
   List,
   ListItem,
   Left,
-  Right
+  Body,
+  Text,
+  Right,
+  Icon,
+  Button
 } from "native-base";
-import axios from 'axios'
+import axios from "axios";
 
-import CustomFooter from "../../../components/Footer";
+const uri =
+  "https://api.backendless.com/1D6EBFAA-2D6A-ACBC-FF77-A80991922A00/A841A3F1-57A0-BB1E-FF8B-343D47243600";
 
-const uri = 'https://api.backendless.com/88269424-FF0F-6299-FFAD-98ED78564100/E87E9DE8-BEB5-B6A8-FF2F-758B1D210D00'
-
+import Footer from "../../../components/Footer";
 
 export default class Main extends Component {
+  state = {
+    form: {}
+  };
 
-  state={
-    from:{}
-  }
-
-  handleLogout(){
-    AsyncStorage.getItem('userToken',(err, result) =>{
-      if(result){
-        axios({
-          method:"get",
-          url: `${uri}/users/logout`,
-          headers:{
-            "user-token": result
-          }
-        }).then(Response=>{
-          AsyncStorage.removeItem("userToken", err=>{
-            if(!err){
-              this.props.navigation.navigate("SignIn")
-            }else{
-              alert("Logout Gagal")
-            }
-          })
-        })
+  handleLogout() {
+    AsyncStorage.clear(err => {
+      if (!err) {
+        this.props.navigation.navigate("SignIn");
+      } else {
+        alert("Logout Gagal");
       }
-    })
+    });
   }
+
   render() {
     return (
       <Container>
-        <Header hasTabs androidStatusBarColor="#b4424b" style={{backgroundColor: '#dd5453'}}>
-          <Body>
-            <Title>Setting</Title>
-          </Body>
-        </Header>
         <Content>
           <List>
             <ListItem
@@ -77,18 +55,20 @@ export default class Main extends Component {
             </ListItem>
           </List>
         </Content>
-        <Button 
-          primary 
-          full style={{ margin: 10, backgroundColor:'#b4424b' }} 
-          onPress={()=>this.handleLogout()}
+        <Button
+          primary
+          full
+          style={{ margin: 10, backgroundColor: "#b4424b" }}
+          onPress={() => this.handleLogout()}
         >
           <Text> Logout </Text>
         </Button>
-        <CustomFooter
-          footer={{
+        <Footer
+          data={{
             activeSettings: true,
-            screenHome: () => this.props.navigation.navigate("FieldHome"),
-            screenCart: () => this.props.navigation.navigate("FieldCart")
+            screenHome: () => this.props.navigation.navigate("CsHome"),
+            screenTransaction: () =>
+              this.props.navigation.navigate("CsTransaction")
           }}
         />
       </Container>
