@@ -1,8 +1,12 @@
 import React, {Component} from 'react'
 import {StyleSheet, Image, KeyboardAvoidingView} from 'react-native'
-import { Content, Text, View, Header, Container, Form, Item, Icon, Input, Button } from 'native-base'
+import { Content, Text, View, Header, 
+        Container, Form, Item, Icon, 
+        Input, Button, ListItem, 
+        Label,Body, Radio } from 'native-base'
 import {} from 'react-navigation'
 import axios from 'axios'
+import ValidationComponent from 'react-native-form-validator'
 
 import config from '../config'
 
@@ -11,7 +15,26 @@ const uri = 'https://api.backendless.com/88269424-FF0F-6299-FFAD-98ED78564100/E8
 export default class FormSignUp extends Component{
 
     state ={
-        dataUser:[]
+        dataUser:{},
+        roleChoice:"",
+        roleUser: [
+            {
+              id: 1,
+              name: "outdoor",
+            },
+            {
+              id: 2,
+              name: "cs",
+            }
+          ],
+      
+    }
+
+    getRole(name, role){
+        this.setState({
+            roleChoice: name,
+            dataUser: { ...this.state.dataUser, role: name }
+          });
     }
 
     getUser(){
@@ -29,12 +52,9 @@ export default class FormSignUp extends Component{
         })
     }
 
-
-
     render(){
         return(
             <Container>
-                {/* <Header androidStatusBarColor="#B4424B" /> */}
                 <Content>
                     <View style={styles.row}>
                         <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
@@ -96,7 +116,22 @@ export default class FormSignUp extends Component{
                                     onChangeText={postal_code=>this.setState({dataUser:{...this.state.dataUser, postal_code}})}
                                     />
                             </Item>
-                            
+                            <Label>Status</Label>
+                            {this.state.roleUser.map((role, index) => {
+                                    return (
+                                        <ListItem key={role.name} style={styles.items}>
+                                            <Radio
+                                                selected={
+                                                    role.name == this.state.roleChoice ? true : false
+                                                }
+                                                onPress={() => this.getRole(role.name, role.value)}
+                                            />
+                                            <Body>
+                                                <Label style={styles.labelSelect}>{role.name}</Label>
+                                            </Body>
+                                        </ListItem>
+                                    );
+                                })}
                             <Button full style={styles.btnSigUp} onPress={()=>this.handleRegister()}><Text>Sign Up</Text></Button>
                             <Button full transparent onPress={()=>this.props.navigation.navigate('SignIn')}><Text>Have an account ? Log In</Text></Button>
                         </Form>
@@ -132,5 +167,11 @@ const styles=StyleSheet.create({
     error:{
         borderWidth:3,
         backgroundColor:'red'
-    }
+    },
+    items: {
+        marginLeft: -0.1
+    },
+    labelSelect: {
+        marginLeft: 20
+      },
 })
