@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, ScrollView, RefreshControl } from 'react-native'
+import { StyleSheet, Image, ScrollView, RefreshControl, AsyncStorage } from 'react-native'
 import { Container, Content, Fab, Icon, Text, View } from 'native-base';
 
 import axios from 'axios'
@@ -11,9 +11,14 @@ export default class TabActive extends Component {
 
     getAllData() {
         this.setState({ refreshing: true });
-        axios.get(`${config.uri}/data/stores?where=status%20%3D%20'active'&props=name%2Caddress%2Clogo&loadRelations=assistant`).then((stores) => {
-            this.setState({ stores: stores.data, refreshing: false })
-        })
+        AsyncStorage.getItem("objectId", (err, result) => {
+            if (result) {
+                axios.get(`${config.uri}/data/stores?where=status%3D'active'%20and%20assistant_outdoor.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_cs`)
+                    .then(stores => {
+                        this.setState({ stores: stores.data, refreshing: false });
+                    });
+            }
+        });
     }
 
     componentDidMount() {
@@ -22,7 +27,7 @@ export default class TabActive extends Component {
 
     state = {
         refreshing: true,
-        stores : []
+        stores: []
     }
 
     render() {
@@ -40,8 +45,6 @@ export default class TabActive extends Component {
 
                     <Content>
 
-                        {/* {this.state.loading == true ? (<Spinner color='red' />) : null} */}
-
                         {(this.state.loading == false) && (this.state.stores.length) == 0 ? (
                             <Text style={{ textAlign: 'center', marginTop: 10 }}>No data</Text>
                         ) : null}
@@ -56,7 +59,7 @@ export default class TabActive extends Component {
                                         <View style={{ flex: 6, paddingLeft: 10 }}>
                                             <Text style={styles.rowTextTitle}>{store.name}</Text>
                                             <Text style={styles.rowTextAsist}>Asisten CS</Text>
-                                            <Text style={styles.rowTextAsistName}>{store.assistant.name}</Text>
+                                            <Text style={styles.rowTextAsistName}>{store.assistant_cs.name}</Text>
                                             <Text style={styles.rowTextAddress}>{store.address}</Text>
                                         </View>
                                     </View>
@@ -73,7 +76,7 @@ export default class TabActive extends Component {
 
                 </ScrollView>
 
-                <Fab style={{ backgroundColor: '#DD5453' }} onPress={()=>this.props.navigation.navigate('FieldHomeAddStore')}>
+                <Fab style={{ backgroundColor: '#DD5453' }} onPress={() => this.props.navigation.navigate('FieldHomeAddStore')}>
                     <Icon name="add" />
                 </Fab>
 
@@ -87,22 +90,22 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         flex: 2
     },
-    rowTextTitle:{
+    rowTextTitle: {
         fontSize: 20,
         marginBottom: 5,
     },
-    rowTextAsist:{  
-        fontSize:13,
-        color:'#828282'
+    rowTextAsist: {
+        fontSize: 13,
+        color: '#828282'
     },
-    rowTextAsistName:{
-        fontSize:15,
-        marginBottom:5,
-        color:'#4c4c4c'
+    rowTextAsistName: {
+        fontSize: 15,
+        marginBottom: 5,
+        color: '#4c4c4c'
     },
-    rowTextAddress:{
-        fontSize:15,
-        color:'#4c4c4c'
+    rowTextAddress: {
+        fontSize: 15,
+        color: '#4c4c4c'
     }
 
 })

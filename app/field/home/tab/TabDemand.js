@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  Image,
-  ScrollView,
-  RefreshControl,
-  AsyncStorage
-} from "react-native";
+import { StyleSheet, Image, ScrollView, RefreshControl, AsyncStorage } from "react-native";
 import { Container, Content, Fab, Icon, Text, View } from "native-base";
 
 import axios from "axios";
@@ -19,13 +13,7 @@ export default class TabDemand extends Component {
 
     AsyncStorage.getItem("objectId", (err, result) => {
       if (result) {
-        // alert(result);
-        axios
-          .get(
-            `${
-              config.uri
-            }/data/stores?where=status%20%3D%20'pending'&props=name%2Caddress%2Clogo&loadRelations=assistant&where=assistant.objectId%20%3D%20'${result}'`
-          )
+        axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_outdoor.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_cs`)
           .then(stores => {
             this.setState({ stores: stores.data, refreshing: false });
           });
@@ -35,13 +23,6 @@ export default class TabDemand extends Component {
 
   componentDidMount() {
     this.getAllData();
-    // alert(JSON.stringify(AsyncStorage.getItem("objectId")));
-
-    // AsyncStorage.getItem("objectId", (error, result) => {
-    //   //   if (result) {
-    //   alert(JSON.stringify(result));
-    //   //   }
-    // });
   }
 
   state = {
@@ -62,7 +43,6 @@ export default class TabDemand extends Component {
           }
         >
           <Content>
-            {/* {this.state.loading == true ? (<Spinner color='red' />) : null} */}
 
             {this.state.loading == false && this.state.stores.length == 0 ? (
               <Text style={{ textAlign: "center", marginTop: 10 }}>
@@ -87,9 +67,7 @@ export default class TabDemand extends Component {
                     <View style={{ flex: 6, paddingLeft: 10 }}>
                       <Text style={styles.rowTextTitle}>{store.name}</Text>
                       <Text style={styles.rowTextAsist}>Asisten CS</Text>
-                      <Text style={styles.rowTextAsistName}>
-                        {store.assistant.name}
-                      </Text>
+                      <Text style={styles.rowTextAsistName}>{store.assistant_cs.name}</Text>
                       <Text style={styles.rowTextAddress}>{store.address}</Text>
                     </View>
                   </View>

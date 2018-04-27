@@ -25,8 +25,6 @@ import axios from "axios";
 import Modal from "react-native-modal";
 import ImagePicker from "react-native-image-picker";
 
-import moment from "moment";
-
 import config from "../../../config";
 
 export default class CsAddStore extends Component {
@@ -159,9 +157,7 @@ export default class CsAddStore extends Component {
       }
     ],
 
-    data: {
-      status: "pending"
-    },
+    data: {},
     deliveryServices: [],
     visibleModal: false,
     users: [],
@@ -182,8 +178,6 @@ export default class CsAddStore extends Component {
     };
 
     ImagePicker.showImagePicker(options, response => {
-      let fileName = response.fileName;
-      fileName = fileName.split(".");
       console.log("Response = ", response);
 
       if (response.didCancel) {
@@ -204,16 +198,10 @@ export default class CsAddStore extends Component {
           type: "image/jpeg",
           name: "Photo"
         });
-
-        fetch(
-          `${config.uri}/files/images/${moment().format("X")}.${
-            fileName[1]
-          }?overwrite=true`,
-          {
-            method: "post",
-            body: data
-          }
-        ).then(result => {
+        fetch(`${config.uri}/files/images/logoToko.png?overwrite=true`, {
+          method: "post",
+          body: data
+        }).then(result => {
           this.setState({
             data: { ...this.state.data, logo: result.url }
           });
@@ -303,8 +291,8 @@ export default class CsAddStore extends Component {
             this.setState({
               data: resultRelation.data
             });
-            this.props.navigation.goBack();
           });
+        this.props.navigation.goBack();
       }
     });
   }
@@ -358,8 +346,7 @@ export default class CsAddStore extends Component {
                         />
                         <Body>
                           <Text>{user.name}</Text>
-                          <Text note>{user.email}</Text>
-                          <Text note>{user.mobile_phone}</Text>
+                          <Text>{user.email}</Text>
                         </Body>
                       </ListItem>
                     );

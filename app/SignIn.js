@@ -47,7 +47,7 @@ export default class SignIn extends Component {
           ["objectId", result.data.objectId],
           ["role", result.data.role]
         ]);
-        if (result.data.role === "lapangan") {
+        if (result.data.role === "outdoor") {
           this.props.navigation.navigate("FieldHome");
         } else if (result.data.role === "cs") {
           this.props.navigation.navigate("CsHome");
