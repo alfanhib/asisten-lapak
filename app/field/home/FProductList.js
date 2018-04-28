@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, View, ScrollView, AsyncStorage } from 'react-native'
-import { Container, Title, Content, Text, Icon, Fab, Card, CardItem, Body, Label, Button } from 'native-base';
+import { StyleSheet, Image, View, RefreshControl, ScrollView, AsyncStorage } from 'react-native'
+import { Container, Title, Content, Text, Icon, Fab,
+	 Card, CardItem, Body, Label, Button } from 'native-base';
 import axios from 'axios';
 
 import config from "../../../config";
-import Footer from '../../../components/Footer'
-import Row from '../../../components/Row'
+import Footer from '../../../components/Footer';
+import Row from '../../../components/Row';
 
-export default class Main extends Component {
+export default class FProductList extends Component {
 	
 	
 	state = {
+		refreshing: true,
 		stores: [],
 		products: []
 	}
@@ -37,16 +39,19 @@ export default class Main extends Component {
 	  }
 
 	  getAllProduct(){
-		const objectId = this.props.navigation.state.params.objectId;
+			const objectId = this.props.navigation.state.params.objectId;
 
-		axios.get(`${config.uri}/data/stores?where=objectId%20%3D%20'${objectId}'`).then(result => {
-			if(result.data){
-				this.setState({
-					products: result.data
-				})
-				
-			}
-		})
+			this.setState({ refreshing: true });
+			
+			axios.get(`${config.uri}/data/products?where=store.objectId%20%3D%20'${objectId}'&loadRelations=store`).then(result => {
+				if(result.data){
+					this.setState({
+						products: result.data,
+						refreshing: false
+					})
+					
+				}
+			})
 	  }
 
 	  componentDidMount(){
@@ -54,94 +59,89 @@ export default class Main extends Component {
 		this.getAllProduct();
 	  }
 
-	render() {
-		return (
+	render(){
+		return(
 			<Container>
-				<Content style={{ backgroundColor: 'white' }}>
-					{/* <Row
-						body={(
-							<View style={{ flexDirection: 'row', padding: 10 }}>
-								<Image style={styles.rowImage}
-									source={require('../../../assets/images/market.png')}
-								/>
-								<View style={{ flex: 5, paddingLeft: 10 }}>
-									<Text style={styles.rowTextTitle}>Cawet Ijo</Text>
-									<Text style={styles.rowTextCondition}>Baru</Text>
-									<Text style={styles.rowTextPrice}>Rp. 200000</Text>
+				<ScrollView
+          style={{ backgroundColor: "white" }}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.getAllProduct.bind(this)}
+            />
+          }
+        >
+					<Content style={{ backgroundColor: 'white' }}>
+
+						{this.state.stores.map((store, indexes) => (
+							<Row
+								body={
+								<View
+										style={{
+										flexDirection: "row",
+										paddingLeft: 20,
+										paddingRight: 20
+									}}
+								>
+									<Image
+										style={styles.rowImage}
+										source={{ uri: store.logo }}
+									/>
+									<View style={{ flex: 6, paddingLeft: 10 }}>
+										<Text style={styles.rowTextTitle}>{store.name}</Text>
+										<Text style={styles.rowSlogan}>{store.slogan}</Text>
+										<Text style={styles.rowTextAsistName}>{store.assistant_cs.name}</Text>
+										<Text style={styles.rowTextAsistName}>{store.assistant_outdoor.name}</Text>
+										<Text style={styles.rowTextAddress}>{store.address}</Text>
+										<Text style={styles.rowWebsite}>{store.website}</Text>
+										<Text style={styles.rowDescription}>{store.description}</Text>
+									</View>
 								</View>
-							</View>
-						)}
-					/> */}
-					{this.state.stores.map((store, indexes) => (
-						<Row
-							body={
-							<View
+								}
+								key={indexes}
+							/>
+						))}
+
+						{ this.state.products.length == 0 ? (
+						<View>
+							<Text style={{ textAlign: "center", marginTop: 10 }}>
+								Product is Empty
+							</Text>
+						</View>
+						) : null}
+
+
+						<Label style={{textAlign: "center"}}>List Product</Label>
+						{this.state.products.map((product, indexes) => (
+							<Row
+								body={
+								<View
 									style={{
 									flexDirection: "row",
 									paddingLeft: 20,
 									paddingRight: 20
-								}}
-							>
-								<Image
+									}}
+								>
+									<Image
 									style={styles.rowImage}
-									source={{ uri: store.logo }}
-								/>
-								<View style={{ flex: 6, paddingLeft: 10 }}>
-									<Text style={styles.rowTextTitle}>{store.name}</Text>
-									<Text style={styles.rowSlogan}>{store.slogan}</Text>
-									<Text style={styles.rowTextAsistName}>{store.assistant_cs.name}</Text>
-									<Text style={styles.rowTextAsistName}>{store.assistant_outdoor.name}</Text>
-									<Text style={styles.rowTextAddress}>{store.address}</Text>
-									<Text style={styles.rowWebsite}>{store.website}</Text>
-									<Text style={styles.rowDescription}>{store.description}</Text>
+									source={{ uri: product.image }}
+									/>
+									<View style={{ flex: 6, paddingLeft: 10 }}>
+									<Text style={styles.rowTextTitle}>{product.name}</Text>
+									<Text style={styles.rowTextAsist}>{product.price}</Text>
+									<Text style={styles.rowTextAsistName}>
+										{product.weight}
+									</Text>
+									<Text style={styles.rowTextAddress}>{product.description}</Text>
+									</View>
 								</View>
-							</View>
-							}
-							key={indexes}
-						/>
-					))}
-
-					{this.state.products.length == 0 ? (
-					<View>
-						<Text style={{ textAlign: "center", marginTop: 10 }}>
-							Product is Empty
-						</Text>
-					</View>
-					) : null}
-
-					{this.state.products.map((product, indexes) => (
-					<View key={indexes}>
-						<Text style={{textAlign: "center"}}>List Product</Text>
-						<Row
-							body={
-							<View
-								style={{
-								flexDirection: "row",
-								paddingLeft: 20,
-								paddingRight: 20
-								}}
-							>
-								<Image
-								style={styles.rowImage}
-								source={{ uri: product.logo }}
-								/>
-								<View style={{ flex: 6, paddingLeft: 10 }}>
-								<Text style={styles.rowTextTitle}>{product.name}</Text>
-								<Text style={styles.rowTextAsist}>Asisten CS</Text>
-								<Text style={styles.rowTextAsistName}>
-									adsfasd
-								</Text>
-								<Text style={styles.rowTextAddress}>dfasdf</Text>
-								</View>
-							</View>
-							}
-							key={indexes}
-						/>
-					</View>
-					))}
-					
-				</Content>
-
+								}
+								key={indexes}
+							/>
+						))}
+						
+					</Content>
+				</ScrollView>
 				<Fab style={{ bottom: 60, backgroundColor: '#DD5453' }}
 					onPress={() => this.props.navigation.navigate('FieldHomeAddProduct', {objectId: this.props.navigation.state.params.objectId})}>
 					<Icon name="add" />
