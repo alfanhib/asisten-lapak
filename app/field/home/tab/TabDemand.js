@@ -74,7 +74,7 @@ export default class TabDemand extends Component {
                 }
                 onpress={{
                   view: () =>
-                    this.props.navigation.navigate("FieldHomeProductList")
+                    this.props.navigation.navigate("FieldHomeProductList", {objectId: store.objectId})
                 }}
                 key={indexes}
               />

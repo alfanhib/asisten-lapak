@@ -24,6 +24,7 @@ import {
 import axios from "axios";
 import Modal from "react-native-modal";
 import ImagePicker from "react-native-image-picker";
+import moment from "moment";
 
 import config from "../../../config";
 
@@ -157,7 +158,9 @@ export default class CsAddStore extends Component {
       }
     ],
 
-    data: {},
+    data: {
+      status: "pending"
+    },
     deliveryServices: [],
     visibleModal: false,
     users: [],
@@ -188,6 +191,9 @@ export default class CsAddStore extends Component {
         console.log("User tapped custom button: ", response.customButton);
       } else {
         let source = { uri: response.uri };
+        let str = response.fileName;
+        let fileName = str.split(".");
+
         this.setState({
           imageSource: source
         });
@@ -198,10 +204,15 @@ export default class CsAddStore extends Component {
           type: "image/jpeg",
           name: "Photo"
         });
-        fetch(`${config.uri}/files/images/logoToko.png?overwrite=true`, {
-          method: "post",
-          body: data
-        }).then(result => {
+        fetch(
+          `${config.uri}/files/logo-toko/${moment().format("X")}.${
+            fileName[1]
+          }`,
+          {
+            method: "post",
+            body: data
+          }
+        ).then(result => {
           this.setState({
             data: { ...this.state.data, logo: result.url }
           });
@@ -267,10 +278,11 @@ export default class CsAddStore extends Component {
   }
 
   getAllUser() {
-    axios.get(`${config.uri}/data/Users`).then(result => {
-      console.log(result.data);
-      this.setState({ users: result.data });
-    });
+    axios
+      .get(`${config.uri}/data/Users?where=role%20%3D%20'outdoor'`)
+      .then(result => {
+        this.setState({ users: result.data });
+      });
   }
 
   handleSubmit() {
@@ -346,7 +358,8 @@ export default class CsAddStore extends Component {
                         />
                         <Body>
                           <Text>{user.name}</Text>
-                          <Text>{user.email}</Text>
+                          <Text note>{user.email}</Text>
+                          <Text note>{user.mobile_phone}</Text>
                         </Body>
                       </ListItem>
                     );

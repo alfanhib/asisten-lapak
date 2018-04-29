@@ -22,6 +22,7 @@ import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 
 import Footer from '../../../components/Footer'
+import config from "../../../config";
 import Row from '../../../components/Row'
 
 const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
@@ -103,7 +104,7 @@ export default class CsAddProduct extends Component {
                 type: "image/jpeg",
                 name: "Photo"
             });
-            fetch(`${uri}/files/images/logoProduct.png?overwrite=true`, {
+            fetch(`${config.uri}/files/images/logoProduct.png?overwrite=true`, {
                 method: "post",
                 body: data
             }).then(result => {
@@ -116,7 +117,7 @@ export default class CsAddProduct extends Component {
       }
 
     allProduct(){
-        axios.get(`${uri}/data/products?sortBy=created%20desc`).then(result => {
+        axios.get(`${config.uri}/data/products?sortBy=created%20desc`).then(result => {
             this.setState({
                 data: result.data
             })
@@ -135,15 +136,28 @@ export default class CsAddProduct extends Component {
             //Get objectID from available_delivery_services, then use it in parameter 2 at axios.post avalibale_delivery_services 
         // ],
 
-        // const dataRelationStores = [
-            //GET objectID from stores, then user it in parameter 2 at axios.post store
-        // ]
+        const objectId = this.props.navigation.state.params.objectId;
+
+        const dataRelationStores = [
+            String(objectId)
+        ]
 
         // alert(JSON.stringify(data));
 
-        axios.post(`${uri}/data/products`, data).then(result => {
+        // axios.post(`${config.uri}/data/products`, data).then(result => {
+        //     if(result.data){
+        //         alert("Success!")
+        //     }
+        // })
+
+        
+        axios.post(`${config.uri}/data/products`, data).then(result => {
             if(result.data){
-                alert("Success!")
+                axios.post(`${config.uri}/data/products/${result.data.objectId}/store:stores:1`, dataRelationStores).then(resultStoreRelation => {
+                    if(resultStoreRelation.data){
+                        this.props.navigation.goBack();
+                    }
+                })
             }
         })
 
@@ -185,22 +199,6 @@ export default class CsAddProduct extends Component {
         return (
             <Container>
                 <Content style={{backgroundColor:'white'}}>
-                    <Row
-                        body={(
-                            <View style={{ flexDirection: 'row',paddingLeft:20,paddingRight:20 }}>
-                                <Image style={styles.rowImage}
-                                    source={require('../../../assets/images/market.png')}
-                                />
-                                <View style={{ flex: 5, paddingLeft: 10 }}>
-                                    <Text style={styles.rowTextTitle}>Els Komputer</Text>
-                                    <Text style={styles.rowTextAsist}>Asisten CS</Text>
-                                    <Text style={styles.rowTextAsistName}>Hafiz Joundy Syafie</Text>
-                                    <Text style={styles.rowTextAddress}>JL DI Panjaitan No 128 Purwokerto</Text>
-                                </View>
-                            </View>
-                        )}
-                    />
-
                     <Form>
                         <View style={{width: '95%', alignSelf:'center'}}>
                             <Label style={styles.upperLimit}>Nama Produk (max 70 karakter)</Label>
@@ -310,33 +308,34 @@ export default class CsAddProduct extends Component {
 }
 
 const styles = StyleSheet.create({
-    buttone: {
-        backgroundColor: "#DD5453"
+    submitBtn:{
+        flex: 1,
+        backgroundColor: "#b4424b"
     },
 
-    iteme: {
+    items:{
         marginLeft: -0.1
     },
 
-    batasAtas: {
+    upperLimit:{
         marginTop: 10
     },
 
-    labelBtn: {
+    labelBtn:{
         marginLeft: 55
     },
 
-    labelSelect: {
+    labelSelect:{
         marginLeft: 20
     },
 
-    label: {
+    label:{
         margin: 20
     },
 
-    fileChooser: {
+    fileChooser:{
         color: '#156af2',
-        marginLeft: -17
+        marginLeft: -15
     },
 
     cardHeader: {
@@ -351,34 +350,21 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
 
-    mainColor: {
+    mainColor:{
         backgroundColor: '#dd5453'
     },
-    rowImage: {
-        resizeMode: 'contain',
-        width: 50,
-        height: 50,
-        flex: 1
+
+    avatarContainer: {
+        borderColor: "#9B9B9B",
+        borderWidth: 1 / PixelRatio.get(),
+        justifyContent: "center",
+        alignItems: "center"
     },
-    rowTextTitle: {
-        fontSize: 20,
-        marginBottom: 5,
-        alignSelf:'flex-start'
-    },
-    rowTextAsist: {
-        fontSize: 13,
-        color: '#828282',
-        alignSelf:'flex-start'
-    },
-    rowTextAsistName: {
-        fontSize: 15,
-        marginBottom: 5,
-        color: '#4c4c4c',
-        alignSelf:'flex-start'
-    },
-    rowTextAddress: {
-        fontSize: 15,
-        color: '#4c4c4c',
-        alignSelf:'flex-start'
+    avatar: {
+        borderRadius: 75,
+        width: 150,
+        height: 150,
+        justifyContent: "center",
+        alignItems: "center"
     }
 })
