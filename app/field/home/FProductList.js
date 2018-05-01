@@ -107,11 +107,10 @@ export default class FProductList extends Component {
 							<Text style={{ textAlign: "center", marginTop: 10 }}>
 								Product is Empty
 							</Text>
+							<Label style={{textAlign: "center"}}>List Product</Label>
 						</View>
 						) : null}
 
-
-						<Label style={{textAlign: "center"}}>List Product</Label>
 						{this.state.products.map((product, indexes) => (
 							<Row
 								body={

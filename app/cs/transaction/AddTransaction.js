@@ -25,6 +25,7 @@ import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
 import Footer from '../../../components/Footer'
+import config from "../../../config";
 
 const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100/data"
 

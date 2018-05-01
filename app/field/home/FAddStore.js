@@ -30,6 +30,7 @@ const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/24
 
 
 import Footer from '../../../components/Footer'
+import config from "../../../config";
 
 
 export default class CsAddStore extends Component {
@@ -37,6 +38,12 @@ export default class CsAddStore extends Component {
     state = {
         selectedStatus: "",
         imageSource: null,
+
+        visibleModal: false,
+        selectedName: null,
+        userObjectId: "",
+
+        users: [],
 
         typesCategory: [{
             id: 1,
@@ -255,12 +262,24 @@ export default class CsAddStore extends Component {
         });
       }
 
+    getAllCS() {
+        axios.get(`${config.uri}/data/Users?where=role%20%3D%20'cs'`).then(result => {
+            alert(result.data);
+            this.setState({ users: result.data });
+        });
+    }
+
+    componentDidMount(){
+        this.getAllCS();
+    }
+
     radioProductStts(name, id){
         this.setState({
             selectedStatus: name,
             radio1: id
         })
     }
+    
 
     addCheckCategories(set, categories) {
 
@@ -598,5 +617,11 @@ const styles = StyleSheet.create({
         height: 150,
         justifyContent: "center",
         alignItems: "center"
-    }
+    },
+    modalContent: {
+        backgroundColor: "white",
+        padding: 2,
+        borderRadius: 4,
+        borderColor: "rgba(0, 0, 0, 0.1)"
+    },
 })
