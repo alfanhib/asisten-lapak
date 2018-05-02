@@ -94,7 +94,11 @@ export default class TabRequestsend extends Component {
                     view: () =>
                       this.props.navigation.navigate(
                         "FieldTransactionRequestView",
-                        { item, status: "pending" }
+                        {
+                          item,
+                          status: "pending",
+                          getAllData: this.getAllData.bind(this)
+                        }
                       )
                   }}
                 />

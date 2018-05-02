@@ -27,10 +27,9 @@ import axios from "axios";
 import Footer from "../../../components/Footer";
 import config from "../../../config";
 
-const uri =
-  "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100/data";
-
 export default class AddTransaction extends Component {
+
+
   state = {
     selectedTypeShipping: "",
     selectedTypePacking: "",
@@ -54,15 +53,33 @@ export default class AddTransaction extends Component {
       }
     ],
 
-    data: {}
+    data: {},
+
+    selected1: "key1",
+
+    products: []
   };
 
   allDeliveryServices() {
     axios
       .get(
         `${
-          config.uri
-        }/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`
+        config.uri
+        }/data/delivery_services?pageSize=100&sortBy=created%20desc`
+      )
+      .then(result => {
+        this.setState({
+          deliveryServices: result.data
+        });
+      });
+  }
+
+  allProducts() {
+    axios
+      .get(
+        `${
+        config.uri
+        }/data/products?pageSize=100&sortBy=created%20desc`
       )
       .then(result => {
         this.setState({
@@ -79,62 +96,17 @@ export default class AddTransaction extends Component {
 
     const typeOfShipp = [this.state.finalDS];
 
-    axios.post(`${config.uri}/transactions`, this.state.data).then(result => {
+    axios.post(`${config.uri}/data/transactions`, this.state.data).then(result => {
       if (result.data) {
-        axios
-          .post(
-            `${config.uri}/transactions/${
-              result.data.objectId
-            }/typeOfShipping:delivery_services:1`,
-            typeOfShipp
-          )
-          .then(result2 => {
-            alert("Success");
-          });
+        axios.post(`${config.uri}/data/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result2 => {
+          alert("Success");
+          this.props.navigation.goBack();
+        }).catch((e) => {
+          alert(e.response.data.message)
+        });
       }
-    });
-
-    //Use it when store objectId is ready
-    // axios.post(`${uri}/transactions`, this.state.data).then(result => {
-    //     if(result.data){
-    //         axios.post(`${uri}/transactions/${result.objectId}/storeId:stores:1`).then(result2 => {
-    //             if(result2.data){
-    //                 axios.post(`${uri}/transactions/${result2.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result => {
-    //                     alert("Success")
-    //                 })
-    //             }
-    //         })
-    //     }
-    // })
-  }
-
-  checkRadioShipping(name, id) {
-    this.setState({
-      deliveryServices: result.data
-    });
-  }
-
-  handleSubmit() {
-    const storeRelation = [
-      //""
-      //Get objectId from store, insert to parameter 2
-    ];
-
-    const typeOfShipp = [this.state.finalDS];
-
-    axios.post(`${config.uri}/transactions`, this.state.data).then(result => {
-      if (result.data) {
-        axios
-          .post(
-            `${config.uri}/transactions/${
-              result.data.objectId
-            }/typeOfShipping:delivery_services:1`,
-            typeOfShipp
-          )
-          .then(result2 => {
-            alert("Success");
-          });
-      }
+    }).catch((e) => {
+      alert(e.response.data.message)
     });
 
     //Use it when store objectId is ready
@@ -169,6 +141,15 @@ export default class AddTransaction extends Component {
 
   componentDidMount() {
     this.allDeliveryServices();
+    this.setState({
+      data: { ...this.state.data, status: "pending", deadlineDate: new Date() }
+    })
+  }
+
+  onValueChange(value) {
+    this.setState({
+      selected1: value
+    });
   }
 
   render() {

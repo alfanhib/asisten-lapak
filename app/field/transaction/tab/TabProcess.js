@@ -90,7 +90,11 @@ export default class TabProcess extends Component {
                     view: () =>
                       this.props.navigation.navigate(
                         "FieldTransactionRequestView",
-                        { item: transaction, status: "process" }
+                        {
+                          item: transaction,
+                          status: "process",
+                          getAllData: this.getAllData.bind(this)
+                        }
                       )
                   }}
                   key={index}

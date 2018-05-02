@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Image, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  FlatList,
+  ActivityIndicator
+} from "react-native";
 import {
   Container,
   Content,
@@ -19,7 +25,8 @@ import Row from "../../../components/Row";
 
 export default class ViewRequest extends Component {
   state = {
-    listTransaction: {}
+    listOrders: null,
+    isLoading: true
   };
 
   getAllOrders() {
@@ -28,11 +35,12 @@ export default class ViewRequest extends Component {
       .get(
         `${config.uri}/data/orders?where=transactionId.objectId%20%3D%20'${
           item.objectId
-        }'&loadRelations=transactionId`
+        }'&loadRelations=productId.store%2CtransactionId`
       )
       .then(result => {
         this.setState({
-          listTransaction: result.data
+          listOrders: result.data,
+          isLoading: false
         });
       });
   }
@@ -41,135 +49,187 @@ export default class ViewRequest extends Component {
     this.getAllOrders();
   }
 
-  handleProcess() {
-    const { status } = this.props.navigation.state.params;
+  handleProcess(objectId) {
+    const { getAllData } = this.props.navigation.state.params;
     axios
       .put(
-        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
+        `${
+          config.uri
+        }/data/bulk/transactions?where=objectId%20%3D%20'${objectId}'`,
         {
           status: "process"
         }
       )
       .then(result => {
+        getAllData();
         this.props.navigation.goBack();
       });
   }
 
-  handleSuccess() {
-    const { status } = this.props.navigation.state.params;
+  handleSuccess(objectId) {
+    const { status, getAllData } = this.props.navigation.state.params;
     axios
       .put(
-        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
+        `${
+          config.uri
+        }/data/bulk/transactions?where=objectId%20%3D%20'${objectId}'`,
         {
           status: "success"
         }
       )
       .then(result => {
+        getAllData();
         this.props.navigation.goBack();
       });
   }
 
-  handleFailed() {
-    const { status } = this.props.navigation.state.params;
+  handleFailed(objectId) {
+    const { status, getAllData } = this.props.navigation.state.params;
     axios
       .put(
-        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
+        `${
+          config.uri
+        }/data/bulk/transactions?where=objectId%20%3D%20'${objectId}'`,
         {
           status: "failed"
         }
       )
       .then(result => {
+        getAllData();
         this.props.navigation.goBack();
       });
   }
 
-  render() {
-    const { item, status } = this.props.navigation.state.params;
+  getTotalPrice() {
+    let hasil = 0;
+    if (this.state.listOrders != null) {
+      this.state.listOrders.map(order => {
+        hasil += order.qty * order.price;
+      });
+      return hasil;
+    }
+  }
 
+  showButton() {
+    const { item, status } = this.props.navigation.state.params;
+    if (status == "pending") {
+      return (
+        <View style={{ margin: 10 }}>
+          <Button
+            full
+            style={{ backgroundColor: "#DD5453" }}
+            onPress={() => this.handleProcess(item.objectId)}
+          >
+            <Text>Proses</Text>
+          </Button>
+        </View>
+      );
+    } else if (status == "process") {
+      return (
+        <View style={{ margin: 10, flexDirection: "row" }}>
+          <Button
+            full
+            success
+            onPress={() => this.handleSuccess(item.objectId)}
+            style={{ flex: 1 }}
+          >
+            <Text>sukses</Text>
+          </Button>
+          <Button
+            full
+            danger
+            onPress={() => this.handleFailed(item.objectId)}
+            style={{ flex: 1 }}
+          >
+            <Text>Gagal</Text>
+          </Button>
+        </View>
+      );
+    } else {
+      return null;
+    }
+  }
+
+  _renderHeader = () => {
+    const { item } = this.props.navigation.state.params;
     return (
-      <Container>
-        <Content style={{ backgroundColor: "#f9f9f9" }}>
-          <Text style={styles.info}>
-            Batas Akhir {moment(item.deadlineDate).format("L")}
-          </Text>
-          <Row
-            body={
-              <View style={{ flexDirection: "row", padding: 10 }}>
-                <Image
+      <View>
+        <Text style={styles.info}>
+          Batas Akhir {moment(item.deadlineDate).format("L")}
+        </Text>
+        <View style={{ flexDirection: "row", padding: 10 }}>
+          {/* <Image
                   style={styles.rowImage}
-                  source={require("../../../assets/images/market.png")}
-                />
-                <View style={{ flex: 5, paddingLeft: 10 }}>
-                  <Text style={styles.rowTextTitle}>{item.name}</Text>
-                  <Text style={styles.rowTextAddress}>{item.address}</Text>
-                  <Text style={styles.rowTextIn}>Masuk</Text>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={styles.rowTextDate}>
-                      {moment(item.created).format("L")}
-                    </Text>
-                    <Text style={styles.rowTextSender}>
-                      {item.typeOfShipping.name}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            }
-          />
-          <Text style={styles.info}>Daftar Barang</Text>
-          <FlatList
-            data={this.state.listTransaction}
-            keyExtractor={item => item.objectId}
-            renderItem={({ item }) => (
-              <ListItem>
-                {/* <Thumbnail circular size={50} source={{ uri: item.image }} /> */}
-                <Body>
-                  <Text>{item.orderProduct}</Text>
-                  <Text note>{item.total}</Text>
-                </Body>
-              </ListItem>
-            )}
-          />
-          <View style={{ flexDirection: "row", margin: 15 }}>
-            <View style={{ flex: 1 }}>
-              <Text>Total</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text>: Rp 21000</Text>
+                  // source={require("../../../assets/images/market.png")}
+                /> */}
+          <View
+            style={{ flex: 5, paddingLeft: 10, backgroundColor: "#ecf0f1" }}
+          >
+            <Text style={styles.rowTextTitle}>{item.name}</Text>
+            <Text style={styles.rowTextAddress}>{item.address}</Text>
+            <Text style={styles.rowTextIn}>Masuk</Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.rowTextDate}>
+                {moment(item.created).format("L")}
+              </Text>
+              <Text style={styles.rowTextSender}>
+                {item.typeOfShipping.name}
+              </Text>
             </View>
           </View>
-          {alert(status)}
+        </View>
+        <Text style={styles.info}>Daftar Barang</Text>
+      </View>
+    );
+  };
 
-          {status == "pending" ? (
-            <View style={{ margin: 20 }}>
-              <Button
-                full
-                style={{ backgroundColor: "#DD5453" }}
-                onPress={() => this.handleProcess()}
-              >
-                <Text>Proses</Text>
-              </Button>
-            </View>
-          ) : (
-            <View style={{ margin: 10, flexDirection: "row", flex: 2 }}>
-              <Button
-                full
-                success
-                onPress={() => this.handleSuccess()}
-                style={{ flex: 1 }}
-              >
-                <Text>sukses</Text>
-              </Button>
-              <Button
-                full
-                danger
-                onPress={() => this.handleFailed()}
-                style={{ flex: 1 }}
-              >
-                <Text>Gagal</Text>
-              </Button>
-            </View>
-          )}
-        </Content>
+  _renderItem = ({ item }) => (
+    <ListItem>
+      <Thumbnail circular size={50} source={{ uri: item.productId.image }} />
+      <Body>
+        <Text>{item.productId.name}</Text>
+        <Text note>{item.qty}</Text>
+        <Text note>{item.price}</Text>
+      </Body>
+    </ListItem>
+  );
+
+  _emptyComponent = () => (
+    <View style={{ justifyContent: "center", alignItems: "center" }}>
+      <Text>Tidak Ada Barang yang di order</Text>
+    </View>
+  );
+
+  render() {
+    return (
+      <Container>
+        {/* <Content style={{ backgroundColor: "#f9f9f9" }}> */}
+        <FlatList
+          onRefresh={() => this.getAllOrders()}
+          refreshing={this.state.isLoading}
+          data={this.state.listOrders}
+          keyExtractor={item => item.objectId}
+          ListHeaderComponent={this._renderHeader}
+          renderItem={this._renderItem}
+          ListEmptyComponent={this._emptyComponent}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            marginLeft: 10,
+            marginRight: 10,
+            justifyContent: "space-between"
+          }}
+        >
+          <View>
+            <Text>Total =</Text>
+          </View>
+          <View>
+            <Text>Rp {this.getTotalPrice()}</Text>
+          </View>
+        </View>
+        {this.showButton()}
+        {/* </Content> */}
 
         <Footer
           data={{
@@ -193,8 +253,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginLeft: 50,
     marginRight: 50,
-    marginTop: 15,
-    marginBottom: 15
+    marginTop: 5,
+    marginBottom: 10
   },
   rowImage: {
     resizeMode: "contain",
