@@ -22,9 +22,14 @@ export default class ViewRequest extends Component {
     listTransaction: {}
   };
 
-  getAllTransaction() {
+  getAllOrders() {
+    const { item } = this.props.navigation.state.params;
     axios
-      .get(`${config.uri}/data/transactions?where=status%20%3D%20'pending'`)
+      .get(
+        `${config.uri}/data/orders?where=transactionId.objectId%20%3D%20'${
+          item.objectId
+        }'&loadRelations=transactionId`
+      )
       .then(result => {
         this.setState({
           listTransaction: result.data
@@ -33,13 +38,14 @@ export default class ViewRequest extends Component {
   }
 
   componentDidMount() {
-    this.getAllTransaction();
+    this.getAllOrders();
   }
 
   handleProcess() {
+    const { status } = this.props.navigation.state.params;
     axios
       .put(
-        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'pending'`,
+        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
         {
           status: "process"
         }
@@ -49,15 +55,43 @@ export default class ViewRequest extends Component {
       });
   }
 
+  handleSuccess() {
+    const { status } = this.props.navigation.state.params;
+    axios
+      .put(
+        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
+        {
+          status: "success"
+        }
+      )
+      .then(result => {
+        this.props.navigation.goBack();
+      });
+  }
+
+  handleFailed() {
+    const { status } = this.props.navigation.state.params;
+    axios
+      .put(
+        `${config.uri}/data/bulk/transactions?where=status%20%3D%20'${status}'`,
+        {
+          status: "failed"
+        }
+      )
+      .then(result => {
+        this.props.navigation.goBack();
+      });
+  }
+
   render() {
-    const { item } = this.props.navigation.state.params;
+    const { item, status } = this.props.navigation.state.params;
+
     return (
       <Container>
         <Content style={{ backgroundColor: "#f9f9f9" }}>
           <Text style={styles.info}>
             Batas Akhir {moment(item.deadlineDate).format("L")}
           </Text>
-
           <Row
             body={
               <View style={{ flexDirection: "row", padding: 10 }}>
@@ -81,24 +115,20 @@ export default class ViewRequest extends Component {
               </View>
             }
           />
-
           <Text style={styles.info}>Daftar Barang</Text>
-
-          <List>
-            <FlatList
-              data={this.state.listTransaction}
-              keyExtractor={item => item.objectId}
-              renderItem={({ item }) => (
-                <ListItem>
-                  {/* <Thumbnail circular size={50} source={{ uri: item.image }} /> */}
-                  <Body>
-                    <Text>{item.orderProduct}</Text>
-                    <Text note>{item.total}</Text>
-                  </Body>
-                </ListItem>
-              )}
-            />
-          </List>
+          <FlatList
+            data={this.state.listTransaction}
+            keyExtractor={item => item.objectId}
+            renderItem={({ item }) => (
+              <ListItem>
+                {/* <Thumbnail circular size={50} source={{ uri: item.image }} /> */}
+                <Body>
+                  <Text>{item.orderProduct}</Text>
+                  <Text note>{item.total}</Text>
+                </Body>
+              </ListItem>
+            )}
+          />
           <View style={{ flexDirection: "row", margin: 15 }}>
             <View style={{ flex: 1 }}>
               <Text>Total</Text>
@@ -107,16 +137,38 @@ export default class ViewRequest extends Component {
               <Text>: Rp 21000</Text>
             </View>
           </View>
+          {alert(status)}
 
-          <View style={{ margin: 20 }}>
-            <Button
-              full
-              style={{ backgroundColor: "#DD5453" }}
-              onPress={() => this.handleProcess()}
-            >
-              <Text>Proses</Text>
-            </Button>
-          </View>
+          {status == "pending" ? (
+            <View style={{ margin: 20 }}>
+              <Button
+                full
+                style={{ backgroundColor: "#DD5453" }}
+                onPress={() => this.handleProcess()}
+              >
+                <Text>Proses</Text>
+              </Button>
+            </View>
+          ) : (
+            <View style={{ margin: 10, flexDirection: "row", flex: 2 }}>
+              <Button
+                full
+                success
+                onPress={() => this.handleSuccess()}
+                style={{ flex: 1 }}
+              >
+                <Text>sukses</Text>
+              </Button>
+              <Button
+                full
+                danger
+                onPress={() => this.handleFailed()}
+                style={{ flex: 1 }}
+              >
+                <Text>Gagal</Text>
+              </Button>
+            </View>
+          )}
         </Content>
 
         <Footer
