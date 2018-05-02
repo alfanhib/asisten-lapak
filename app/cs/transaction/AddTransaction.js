@@ -27,9 +27,6 @@ import axios from "axios";
 import Footer from "../../../components/Footer";
 import config from "../../../config";
 
-const uri =
-  "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100/data";
-
 export default class AddTransaction extends Component {
   state = {
     selectedTypeShipping: "",
@@ -61,8 +58,8 @@ export default class AddTransaction extends Component {
     axios
       .get(
         `${
-          config.uri
-        }/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`
+        config.uri
+        }/data/delivery_services?pageSize=100&sortBy=created%20desc`
       )
       .then(result => {
         this.setState({
@@ -84,7 +81,7 @@ export default class AddTransaction extends Component {
         axios
           .post(
             `${config.uri}/transactions/${
-              result.data.objectId
+            result.data.objectId
             }/typeOfShipping:delivery_services:1`,
             typeOfShipp
           )
@@ -108,12 +105,6 @@ export default class AddTransaction extends Component {
     // })
   }
 
-  checkRadioShipping(name, id) {
-    this.setState({
-      deliveryServices: result.data
-    });
-  }
-
   handleSubmit() {
     const storeRelation = [
       //""
@@ -127,7 +118,7 @@ export default class AddTransaction extends Component {
         axios
           .post(
             `${config.uri}/transactions/${
-              result.data.objectId
+            result.data.objectId
             }/typeOfShipping:delivery_services:1`,
             typeOfShipp
           )

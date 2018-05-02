@@ -53,112 +53,7 @@ export default class CsAddStore extends Component {
 
     users: [],
 
-    typesCategory: [
-      {
-        id: 1,
-        name: "Fashion Wanita"
-      },
-      {
-        id: 2,
-        name: "Fashion Pria"
-      },
-      {
-        id: 3,
-        name: "Fashion Muslim"
-      },
-      {
-        id: 4,
-        name: "Fashion Anak"
-      },
-      {
-        id: 5,
-        name: "Handphone dan Tablet"
-      },
-      {
-        id: 6,
-        name: "Elektronik"
-      },
-      {
-        id: 7,
-        name: "Kecantikan"
-      },
-      {
-        id: 8,
-        name: "Kesehatan"
-      },
-      {
-        id: 9,
-        name: "Ibu dan bayi"
-      },
-      {
-        id: 10,
-        name: "Perawatan tubuh"
-      },
-      {
-        id: 11,
-        name: "Rumah Tangga"
-      },
-      {
-        id: 12,
-        name: "Gaming"
-      },
-      {
-        id: 13,
-        name: "Laptop dan Aksesoris"
-      },
-      {
-        id: 14,
-        name: "Komputer dan Aksesoris"
-      },
-      {
-        id: 15,
-        name: "Kamera"
-      },
-      {
-        id: 16,
-        name: "Otomotif"
-      },
-      {
-        id: 17,
-        name: "Olahraga"
-      },
-      {
-        id: 18,
-        name: "Film dan Musik"
-      },
-      {
-        id: 19,
-        name: "Dapur"
-      },
-      {
-        id: 20,
-        name: "Office dan Stationeri"
-      },
-      {
-        id: 21,
-        name: "Sofenir dan Kado"
-      },
-      {
-        id: 22,
-        name: "Mainan dan Hobi"
-      },
-      {
-        id: 23,
-        name: "Makanan dan Minuman"
-      },
-      {
-        id: 24,
-        name: "Buku"
-      },
-      {
-        id: 25,
-        name: "Software"
-      },
-      {
-        id: 26,
-        name: "Produk Lainya"
-      }
-    ],
+    typesCategory: [],
 
     check: [],
     checkk: [],
@@ -194,6 +89,7 @@ export default class CsAddStore extends Component {
     deliveryServices: [],
 
     delivery_services: [],
+    objectIdCategories: [],
 
     asCategories: [],
     getCheckName: [],
@@ -258,6 +154,14 @@ export default class CsAddStore extends Component {
       });
   }
 
+  getAllCategoryTypes() {
+    axios
+      .get(`${config.uri}/data/category_types?sortBy=created%20desc`)
+      .then(result => {
+        this.setState({ typesCategory: result.data });
+      });
+  }
+
   radioProductStts(name, id) {
     this.setState({
       selectedStatus: name,
@@ -265,27 +169,21 @@ export default class CsAddStore extends Component {
     });
   }
 
-  addCheckCategories(set, categories_) {
+  addCheckCategories(set) {
     if (!this.state.check.includes(set)) {
       getCheck = this.state.check;
       getCheck.push(set);
-      getCheckName = this.state.asCategories;
-      getCheckName.push(categories_);
-      alert(getCheckName);
       this.setState({
         check: getCheck,
         check1: getCheck,
-        getCheckName: this.state.asCategories,
-        data: { ...this.state.data, categories: getCheckName }
+        objectIdCategories: getCheck
       });
     } else {
       geCheck = this.state.check;
       geCheck = geCheck.filter(item => item !== set);
-      geCheckName = this.state.asCategories,
-        geCheckName = geCheck.filter(item => item !== set);
       this.setState({
         check: geCheck,
-        asCategories: geCheckName
+        objectIdCategories: geCheck
       });
     }
   }
@@ -303,7 +201,8 @@ export default class CsAddStore extends Component {
       geCheck = this.state.checkk;
       geCheck = geCheck.filter(item => item !== set);
       this.setState({
-        checkk: geCheck
+        checkk: geCheck,
+        delivery_services: geCheck
       });
     }
   }
@@ -325,6 +224,7 @@ export default class CsAddStore extends Component {
   handleSubmit() {
     const assistantRelation = [this.state.userObjectId];
     const deliveryRelation = this.state.delivery_services;
+    const categoryRelation = this.state.objectIdCategories;
 
     // axios.post(`${uri}/data/stores`, this.state.data).then(result => {
     //     if(result.data){
@@ -339,8 +239,14 @@ export default class CsAddStore extends Component {
           if (assistantResult.data) {
             axios.post(`${config.uri}/data/stores/${result.data.objectId}/available_delivery_services:delivery_services:n`, deliveryRelation).then(deliveryResult => {
               if (deliveryResult.data) {
-                alert("Success!");
-                this.props.navigation.goBack();
+                axios.post(`${config.uri}/data/stores/${result.data.objectId}/categories:category_types:n`, categoryRelation).then(categoriesResult => {
+                  if (categoriesResult.data) {
+                    alert("Success!");
+                    this.props.navigation.goBack();
+                  }
+                }).catch((e) => {
+                  alert(e.response.data.message)
+                });
               }
             }).catch((e) => {
               alert(e.response.data.message)
@@ -361,6 +267,7 @@ export default class CsAddStore extends Component {
         data: { ...this.state.data, status: "Pending" }
       });
     this.getAllCS();
+    this.getAllCategoryTypes();
   }
 
   render() {
@@ -567,18 +474,22 @@ export default class CsAddStore extends Component {
 
             <Label style={styles.upperLimit}>Jenis barang (Kategori)</Label>
 
-            {this.state.typesCategory.map((item, key) => (
-              <ListItem key={key} style={styles.items}>
-                <CheckBox
-                  onPress={() => this.addCheckCategories(item.id, item.name)}
-                  checked={this.state.check.includes(item.id) ? true : false}
-                  color="#dd5453"
-                />
-                <Body>
-                  <Label style={styles.labelSelect}>{item.name}</Label>
-                </Body>
-              </ListItem>
-            ))}
+            {this.state.typesCategory.map(item => {
+              return (
+                <ListItem key={item.objectId} style={styles.items}>
+                  <CheckBox
+                    onPress={() => this.addCheckCategories(item.objectId)}
+                    checked={
+                      this.state.check.includes(item.objectId) ? true : false
+                    }
+                    color="#dd5453"
+                  />
+                  <Body>
+                    <Label style={styles.labelSelect}>{item.name}</Label>
+                  </Body>
+                </ListItem>
+              );
+            })}
 
             {/* {this.state.check.map((check, key) => (
                             <Text key={key}>{check}</Text>
