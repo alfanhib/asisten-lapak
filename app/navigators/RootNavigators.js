@@ -33,7 +33,7 @@ const AssitantCSMain = TabNavigator({
       AssistantCSHomeActive: {
         screen: AssistantCSHomeActive,
         navigationOptions: {
-          title: 'Active'
+          title: 'Aktif'
         }
       },
       AssistantCSHomePending: {
@@ -53,7 +53,7 @@ const AssitantCSMain = TabNavigator({
       }
     }),
     navigationOptions: {
-      title: 'Home',
+      title: 'Beranda',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-home" style={{
           color: tintColor
@@ -72,19 +72,19 @@ const AssitantCSMain = TabNavigator({
       AssistantCSTransactionProcess:{
         screen: AssistantCSTransactionProcess,
         navigationOptions: {
-          title: 'Process'
+          title: 'Proses'
         }
       },
       AssistantCSTransactionSuccess:{
         screen: AssistantCSTransactionSuccess,
         navigationOptions: {
-          title: 'Success'
+          title: 'Sukses'
         }
       },
       AssistantCSTransactionFailed:{
         screen: AssistantCSTransactionFailed,
         navigationOptions: {
-          title: 'Failed'
+          title: 'Gagal'
         }
       },
     },{
@@ -99,7 +99,7 @@ const AssitantCSMain = TabNavigator({
       }
     }),
     navigationOptions: {
-      title: 'Transactions',
+      title: 'Transaksi',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-cash" style={{
           color: tintColor
@@ -110,7 +110,7 @@ const AssitantCSMain = TabNavigator({
   AssistantCSSettings: {
     screen: AssistantCSSettings,
     navigationOptions: {
-      title: 'Settings',
+      title: 'Pengaturan',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-settings" style={{
           color: tintColor
@@ -139,7 +139,7 @@ const AssitantOutdoorMain = TabNavigator({
       AssistantOutdoorHomeActive: {
         screen: AssistantOutdoorHomeActive,
         navigationOptions: {
-          title: 'Active'
+          title: 'Aktif'
         }
       },
       AssistantOutdoorHomePending: {
@@ -159,7 +159,7 @@ const AssitantOutdoorMain = TabNavigator({
       }
     }),
     navigationOptions: {
-      title: 'Home',
+      title: 'Beranda',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-home" style={{
           color: tintColor
@@ -172,25 +172,25 @@ const AssitantOutdoorMain = TabNavigator({
       AssistantOutdoorTransactionPending:{
         screen: AssistantOutdoorTransactionPending,
         navigationOptions: {
-          title: 'Pending'
+          title: 'Permintaan'
         }
       },
       AssistantOutdoorTransactionProcess:{
         screen: AssistantOutdoorTransactionProcess,
         navigationOptions: {
-          title: 'Process'
+          title: 'Proses'
         }
       },
       AssistantOutdoorTransactionSuccess:{
         screen: AssistantOutdoorTransactionSuccess,
         navigationOptions: {
-          title: 'Success'
+          title: 'Sukses'
         }
       },
       AssistantOutdoorTransactionFailed:{
         screen: AssistantOutdoorTransactionFailed,
         navigationOptions: {
-          title: 'Failed'
+          title: 'Gagal'
         }
       },
     },{
@@ -205,7 +205,7 @@ const AssitantOutdoorMain = TabNavigator({
       }
     }),
     navigationOptions: {
-      title: 'Transactions',
+      title: 'Transaksi',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-cash" style={{
           color: tintColor
@@ -216,7 +216,7 @@ const AssitantOutdoorMain = TabNavigator({
   AssistantOutdoorSettings: {
     screen: AssistantOutdoorSettings,
     navigationOptions: {
-      title: 'Settings',
+      title: 'Pengaturan',
       tabBarIcon: ({focused, tintColor}) => {
         return <Icon name="ios-settings" style={{
           color: tintColor

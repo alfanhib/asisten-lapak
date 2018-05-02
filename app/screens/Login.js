@@ -18,29 +18,15 @@ class Login extends Component {
 
   navigateToAssistantCS() {
     this.props.dispatch({
-      type: 'Navigation/RESET',
-      index: 0,
-      key: null,
-      actions: [
-        {
-          type: 'Navigation/NAVIGATE',
-          routeName: 'AssitantCSMain'
-        },
-      ]
+      type: 'Navigation/NAVIGATE',
+      routeName: 'AssitantCSMain'
     })
   }
 
   navigateToAssistantOutdoor() {
     this.props.dispatch({
-      type: 'Navigation/RESET',
-      index: 0,
-      key: null,
-      actions: [
-        {
-          type: 'Navigation/NAVIGATE',
-          routeName: 'AssitantOutdoorMain'
-        },
-      ]
+      type: 'Navigation/NAVIGATE',
+      routeName: 'AssitantOutdoorMain'
     })
   }
 
