@@ -28,6 +28,8 @@ import Footer from "../../../components/Footer";
 import config from "../../../config";
 
 export default class AddTransaction extends Component {
+
+
   state = {
     selectedTypeShipping: "",
     selectedTypePacking: "",
@@ -51,7 +53,11 @@ export default class AddTransaction extends Component {
       }
     ],
 
-    data: {}
+    data: {},
+
+    selected1: "key1",
+
+    products: []
   };
 
   allDeliveryServices() {
@@ -68,41 +74,18 @@ export default class AddTransaction extends Component {
       });
   }
 
-  handleSubmit() {
-    const storeRelation = [
-      //""
-      //Get objectId from store, insert to parameter 2
-    ];
-
-    const typeOfShipp = [this.state.finalDS];
-
-    axios.post(`${config.uri}/transactions`, this.state.data).then(result => {
-      if (result.data) {
-        axios
-          .post(
-            `${config.uri}/transactions/${
-            result.data.objectId
-            }/typeOfShipping:delivery_services:1`,
-            typeOfShipp
-          )
-          .then(result2 => {
-            alert("Success");
-          });
-      }
-    });
-
-    //Use it when store objectId is ready
-    // axios.post(`${uri}/transactions`, this.state.data).then(result => {
-    //     if(result.data){
-    //         axios.post(`${uri}/transactions/${result.objectId}/storeId:stores:1`).then(result2 => {
-    //             if(result2.data){
-    //                 axios.post(`${uri}/transactions/${result2.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result => {
-    //                     alert("Success")
-    //                 })
-    //             }
-    //         })
-    //     }
-    // })
+  allProducts() {
+    axios
+      .get(
+        `${
+        config.uri
+        }/data/products?pageSize=100&sortBy=created%20desc`
+      )
+      .then(result => {
+        this.setState({
+          deliveryServices: result.data
+        });
+      });
   }
 
   handleSubmit() {
@@ -113,19 +96,17 @@ export default class AddTransaction extends Component {
 
     const typeOfShipp = [this.state.finalDS];
 
-    axios.post(`${config.uri}/transactions`, this.state.data).then(result => {
+    axios.post(`${config.uri}/data/transactions`, this.state.data).then(result => {
       if (result.data) {
-        axios
-          .post(
-            `${config.uri}/transactions/${
-            result.data.objectId
-            }/typeOfShipping:delivery_services:1`,
-            typeOfShipp
-          )
-          .then(result2 => {
-            alert("Success");
-          });
+        axios.post(`${config.uri}/data/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(result2 => {
+          alert("Success");
+          this.props.navigation.goBack();
+        }).catch((e) => {
+          alert(e.response.data.message)
+        });
       }
+    }).catch((e) => {
+      alert(e.response.data.message)
     });
 
     //Use it when store objectId is ready
@@ -160,6 +141,15 @@ export default class AddTransaction extends Component {
 
   componentDidMount() {
     this.allDeliveryServices();
+    this.setState({
+      data: { ...this.state.data, status: "pending", deadlineDate: new Date() }
+    })
+  }
+
+  onValueChange(value) {
+    this.setState({
+      selected1: value
+    });
   }
 
   render() {
