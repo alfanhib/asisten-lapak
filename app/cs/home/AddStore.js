@@ -33,112 +33,13 @@ export default class CsAddStore extends Component {
     selectedStatus: "",
     imageSource: null,
 
-    typesCategory: [
-      {
-        id: 1,
-        name: "Fashion Wanita"
-      },
-      {
-        id: 2,
-        name: "Fashion Pria"
-      },
-      {
-        id: 3,
-        name: "Fashion Muslim"
-      },
-      {
-        id: 4,
-        name: "Fashion Anak"
-      },
-      {
-        id: 5,
-        name: "Handphone dan Tablet"
-      },
-      {
-        id: 6,
-        name: "Elektronik"
-      },
-      {
-        id: 7,
-        name: "Kecantikan"
-      },
-      {
-        id: 8,
-        name: "Kesehatan"
-      },
-      {
-        id: 9,
-        name: "Ibu dan bayi"
-      },
-      {
-        id: 10,
-        name: "Perawatan tubuh"
-      },
-      {
-        id: 11,
-        name: "Rumah Tangga"
-      },
-      {
-        id: 12,
-        name: "Gaming"
-      },
-      {
-        id: 13,
-        name: "Laptop dan Aksesoris"
-      },
-      {
-        id: 14,
-        name: "Komputer dan Aksesoris"
-      },
-      {
-        id: 15,
-        name: "Kamera"
-      },
-      {
-        id: 16,
-        name: "Otomotif"
-      },
-      {
-        id: 17,
-        name: "Olahraga"
-      },
-      {
-        id: 18,
-        name: "Film dan Musik"
-      },
-      {
-        id: 19,
-        name: "Dapur"
-      },
-      {
-        id: 20,
-        name: "Office dan Stationeri"
-      },
-      {
-        id: 21,
-        name: "Sofenir dan Kado"
-      },
-      {
-        id: 22,
-        name: "Mainan dan Hobi"
-      },
-      {
-        id: 23,
-        name: "Makanan dan Minuman"
-      },
-      {
-        id: 24,
-        name: "Buku"
-      },
-      {
-        id: 25,
-        name: "Software"
-      },
-      {
-        id: 26,
-        name: "Produk Lainya"
-      }
-    ],
+    visibleModal: false,
+    selectedName: null,
+    userObjectId: "",
+
+    users: [],
+
+    typesCategory: [],
 
     check: [],
     checkk: [],
@@ -162,10 +63,13 @@ export default class CsAddStore extends Component {
       status: "pending"
     },
     deliveryServices: [],
-    visibleModal: false,
-    users: [],
-    selectedName: null,
-    userObjectId: "",
+
+    delivery_services: [],
+    objectIdCategories: [],
+
+    asCategories: [],
+    getCheckName: [],
+
     check1: [],
     check2: []
   };
@@ -263,7 +167,7 @@ export default class CsAddStore extends Component {
     }
   }
 
-  allDeliveryServices() {
+  getAllDeliveryServices() {
     axios
       .get(
         `${
@@ -277,6 +181,20 @@ export default class CsAddStore extends Component {
       });
   }
 
+  getAllCategory() {
+    axios
+      .get(
+        `${
+          config.uri
+        }/data/category_types?pageSize=100&offset=0&sortBy=created%20desc`
+      )
+      .then(result => {
+        this.setState({
+          typesCategory: result.data
+        });
+      });
+  }
+
   getAllUser() {
     axios
       .get(`${config.uri}/data/Users?where=role%20%3D%20'outdoor'`)
@@ -286,31 +204,70 @@ export default class CsAddStore extends Component {
   }
 
   handleSubmit() {
-    const userAssistant = [this.state.userObjectId];
+    const assistantRelation = [this.state.userObjectId];
+    const deliveryRelation = this.state.delivery_services;
+    const categoryRelation = this.state.objectIdCategories;
 
     //post data ke API
-    axios.post(`${config.uri}/data/stores`, this.state.data).then(result => {
-      if (result.data) {
-        axios
-          .post(
-            `${config.uri}/data/stores/${
-              result.data.objectId
-            }/assistant:Users:1`,
-            userAssistant
-          )
-          .then(resultRelation => {
-            //set state to return result.data and emptying field title
-            this.setState({
-              data: resultRelation.data
+    axios
+      .post(`${config.uri}/data/stores`, this.state.data)
+      .then(result => {
+        if (result.data) {
+          axios
+            .post(
+              `${config.uri}/data/stores/${
+                result.data.objectId
+              }/assistant_outdoor:Users:1`,
+              assistantRelation
+            )
+            .then(assistantResult => {
+              if (assistantResult.data) {
+                axios
+                  .post(
+                    `${config.uri}/data/stores/${
+                      result.data.objectId
+                    }/available_delivery_services:delivery_services:n`,
+                    deliveryRelation
+                  )
+                  .then(deliveryResult => {
+                    if (deliveryResult.data) {
+                      axios
+                        .post(
+                          `${config.uri}/data/stores/${
+                            result.data.objectId
+                          }/categories:category_types:n`,
+                          categoryRelation
+                        )
+                        .then(categoriesResult => {
+                          if (categoriesResult.data) {
+                            alert("Success!");
+                            this.props.navigation.goBack();
+                          }
+                        })
+                        .catch(e => {
+                          alert(e.response.data.message);
+                        });
+                    }
+                  })
+                  .catch(e => {
+                    alert(e.response.data.message);
+                  });
+              }
+            })
+            .catch(e => {
+              alert(e.response.data.message);
             });
-          });
-        this.props.navigation.goBack();
-      }
-    });
+        }
+      })
+      .catch(e => {
+        alert(e.response.data.message);
+      });
+    this.props.navigation.goBack();
   }
 
   componentDidMount() {
-    this.allDeliveryServices();
+    this.getAllDeliveryServices();
+    this.getAllCategory();
     this.getAllUser();
   }
 
@@ -520,11 +477,13 @@ export default class CsAddStore extends Component {
 
             <Label style={styles.upperLimit}>Jenis barang (Kategori)</Label>
 
-            {this.state.typesCategory.map((item, key) => (
-              <ListItem key={key} style={styles.items}>
+            {this.state.typesCategory.map(item => (
+              <ListItem key={item.objectId} style={styles.items}>
                 <CheckBox
-                  onPress={() => this.addCheckCategories(item.id, item.name)}
-                  checked={this.state.check.includes(item.id) ? true : false}
+                  onPress={() => this.addCheckCategories(item.objectId)}
+                  checked={
+                    this.state.check.includes(item.objectId) ? true : false
+                  }
                   color="#dd5453"
                 />
                 <Body>

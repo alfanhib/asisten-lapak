@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, Image, ScrollView, RefreshControl,AsyncStorage } from "react-native";
+import {
+  StyleSheet,
+  Image,
+  ScrollView,
+  RefreshControl,
+  AsyncStorage
+} from "react-native";
 import { Container, Content, Fab, Icon, Text, View } from "native-base";
 
 import axios from "axios";
@@ -8,18 +14,22 @@ import config from "../../../../config";
 import Row from "../../../../components/Row";
 
 export default class TabPending extends Component {
-
   getAllData() {
-        this.setState({ refreshing: true });
-        AsyncStorage.getItem("objectId", (err, result) => {
-            if (result) {
-                axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_cs.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_outdoor`)
-                    .then(stores => {
-                        this.setState({ stores: stores.data, refreshing: false });
-                    });
-            }
-        });
-    }
+    this.setState({ refreshing: true });
+    AsyncStorage.getItem("objectId", (err, result) => {
+      if (result) {
+        axios
+          .get(
+            `${
+              config.uri
+            }/data/stores?where=status%3D'pending'%20and%20assistant_cs.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_outdoor`
+          )
+          .then(stores => {
+            this.setState({ stores: stores.data, refreshing: false });
+          });
+      }
+    });
+  }
 
   componentDidMount() {
     this.getAllData();
@@ -77,7 +87,9 @@ export default class TabPending extends Component {
                 }
                 onpress={{
                   view: () =>
-                    this.props.navigation.navigate("FieldHomeProductList")
+                    this.props.navigation.navigate("FieldHomeProductList", {
+                      objectId: store.objectId
+                    })
                 }}
                 key={indexes}
               />

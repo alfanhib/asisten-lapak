@@ -13,6 +13,7 @@ import CsHomeAddStore from "./app/cs/home/AddStore";
 import CsTransaction from "./app/cs/transaction/Main";
 import CsTransactionAdd from "./app/cs/transaction/AddTransaction";
 import CsTransactionAddPassing from "./app/cs/transaction/AddTransactionPassing";
+import CsTransactionRequestView from "./app/cs/transaction/ViewRequest";
 import CsSettings from "./app/cs/settings/Main";
 
 import FieldHome from "./app/field/home/Main";
@@ -89,6 +90,14 @@ const App = StackNavigator(
       navigationOptions: {
         title: "Add Transaction",
         headerLeft: null,
+        headerStyle: styles.header,
+        headerTintColor: "#fff"
+      }
+    },
+    CsTransactionRequestView: {
+      screen: CsTransactionRequestView,
+      navigationOptions: {
+        title: "Cs Transaction Request",
         headerStyle: styles.header,
         headerTintColor: "#fff"
       }
