@@ -56,6 +56,7 @@ export default class AddTransaction extends Component {
     ],
 
     data: {},
+    orderData: {},
 
     visibleModal: false,
     selectedName: null,
@@ -71,7 +72,8 @@ export default class AddTransaction extends Component {
     products: [],
 
     productPrice: "",
-    productName: ""
+    productId: "",
+    transactionId: ""
   };
 
   allDeliveryServices() {
@@ -112,6 +114,10 @@ export default class AddTransaction extends Component {
 
     const typeOfShipp = [this.state.finalDS];
 
+    const productRelation = [this.state.productId];
+
+    const transactionRelation = [this.state.transactionId];
+
     axios.post(`${config.uri}/data/transactions`, this.state.data).then(result => {
       if (result.data) {
         axios.post(`${config.uri}/data/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(resultTypeShipp => {
@@ -120,6 +126,25 @@ export default class AddTransaction extends Component {
               if (storeResult.data) {
                 alert("Success!");
                 this.props.navigation.goBack();
+                axios.post(`${config.uri}/data/orders`, this.state.orderData).then(resultOrder => {
+                  if (resultOrder.data) {
+                    axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/productId:products:1`, productRelation).then(productResult => {
+                      if (productResult.data) {
+                        axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/transactionId:transactions:1`, [String(result.data.objectId)]).then(transactionResult => {
+                          if (transactionResult.data) {
+                            alert("Success!")
+                          }
+                        }).catch((e) => {
+                          alert(e.response.data.message)
+                        });
+                      }
+                    }).catch((e) => {
+                      alert(e.response.data.message)
+                    });
+                  }
+                }).catch((e) => {
+                  alert(e.response.data.message)
+                });
               }
             }).catch((e) => {
               alert(e.response.data.message)
@@ -132,6 +157,8 @@ export default class AddTransaction extends Component {
     }).catch((e) => {
       alert(e.response.data.message)
     });
+
+
   }
 
   checkRadioShipping(name, id) {
@@ -271,7 +298,9 @@ export default class AddTransaction extends Component {
                             productObjectId: product.objectId,
                             visibleModalProduct: false,
                             productPrice: product.price,
-                            data: { ...this.state.data, orderProduct: product.name }
+                            productId: product.objectId,
+                            data: { ...this.state.data, orderProduct: product.name },
+                            orderData: { ...this.state.orderData, price: Number(product.price) }
                           })
                         }
                       >
@@ -304,7 +333,8 @@ export default class AddTransaction extends Component {
               <Input
                 onChangeText={stockAvailability =>
                   this.setState({
-                    data: { ...this.state.data, stockAvailability, total: this.state.productPrice * stockAvailability }
+                    data: { ...this.state.data, stockAvailability, total: this.state.productPrice * stockAvailability },
+                    orderData: { ...this.state.orderData, qty: Number(stockAvailability) }
                   })
                 }
                 keyboardType="numeric"
@@ -326,7 +356,7 @@ export default class AddTransaction extends Component {
             <Item regular>
               <Input
                 onChangeText={orderNumber =>
-                  this.setState({ data: { ...this.state.data, orderNumber } })
+                  this.setState({ data: { ...this.state.data, orderNumber: Number(orderNumber) } })
                 }
                 keyboardType="numeric"
               />
