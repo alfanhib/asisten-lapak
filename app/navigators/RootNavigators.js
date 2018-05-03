@@ -2,7 +2,8 @@ import React from 'react';
 import {Icon} from 'native-base';
 import {StackNavigator, TabNavigator} from 'react-navigation';
 
-import Login from '../screens/Login';
+import Login from '../signIn/screens/SignIn'
+import SignUp from '../signUp/screens/SignUp'
 
 //assistant cs home
 import AssistantCSHomeActive from '../assistantCS/screens/home/Active'
@@ -242,30 +243,46 @@ const AssitantOutdoorMain = TabNavigator({
 const RootNavigator = StackNavigator({
   AssitantCSMain: {
     screen: AssitantCSMain,
-    navigationOptions: {
-      headerTintColor:'white',
-      headerStyle: {
-        backgroundColor: "#DD5453",
-        elevation: 0
-      }
-    }
+    // navigationOptions: {
+    //   headerTintColor:'white',
+    //   headerStyle: {
+    //     backgroundColor: "#DD5453",
+    //     elevation: 0
+    //   }
+    // }
   },
   AssitantOutdoorMain: {
     screen: AssitantOutdoorMain,
-    navigationOptions: {
-      headerTintColor:'white',
-      headerStyle: {
-        backgroundColor: "#DD5453",
-        elevation: 0
-      }
-    }
+    // navigationOptions: {
+    //   headerTintColor:'white',
+    //   headerStyle: {
+    //     backgroundColor: "#DD5453",
+    //     elevation: 0
+    //   }
+    // }
   },
   Login: {
     screen: Login,
     navigationOptions: {
       title: 'Login'
     }
+  },
+  Signup:{
+    screen: SignUp,
+    navigationOptions:{
+      title: 'Sign Up'
+    }
   }
-})
+},{
+  navigationOptions: {
+    headerTintColor:'white',
+    headerStyle: {
+      backgroundColor: "#DD5453",
+      elevation: 0
+    }
+  }
+}
+)
+
 
 export default RootNavigator;
