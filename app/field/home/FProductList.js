@@ -44,7 +44,7 @@ export default class FProductList extends Component {
         axios
           .get(
             `${
-              config.uri
+            config.uri
             }/data/stores?where=status%20%3D%20'pending'&loadRelations=assistant_outdoor%2Cassistant_cs&where=assistant_outdoor.objectId%20%3D%20'${result}'&where=objectId%20%3D%20'${objectId}'`
           )
           .then(stores => {
@@ -62,7 +62,7 @@ export default class FProductList extends Component {
     axios
       .get(
         `${
-          config.uri
+        config.uri
         }/data/products?where=store.objectId%20%3D%20'${objectId}'&loadRelations=store`
       )
       .then(result => {

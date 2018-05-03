@@ -275,12 +275,12 @@ export default class CsAddStore extends Component {
       <Container>
         <Content padder>
           <Form>
-            <Label style={styles.upperLimit}>Nama Asisten Lapak </Label>
+            <Label style={styles.upperLimit}>Nama Customer Lapak </Label>
             <List style={{ marginLeft: -30 }}>
               <ListItem onPress={() => this.setState({ visibleModal: true })}>
                 <Body>
                   {this.state.selectedName === null ? (
-                    <Text>Please Select Assistant</Text>
+                    <Text>Please Select Customer</Text>
                   ) : (
                       <Text>{this.state.selectedName}</Text>
                     )}
