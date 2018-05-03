@@ -36,9 +36,6 @@ import ImagePicker from "react-native-image-picker";
 import Modal from "react-native-modal";
 import moment from "moment";
 
-const uri =
-  "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
-
 import Footer from "../../../components/Footer";
 import config from "../../../config";
 

@@ -13,7 +13,7 @@ export default class TabDemand extends Component {
 
     AsyncStorage.getItem("objectId", (err, result) => {
       if (result) {
-        axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_outdoor.objectId%3D'${result}'&props=name%2Caddress%2Clogo&loadRelations=assistant_cs`)
+        axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_outdoor.objectId%3D'${result}'&loadRelations=available_delivery_services%2Cassistant_cs`)
           .then(stores => {
             this.setState({ stores: stores.data, refreshing: false });
           });
@@ -74,7 +74,9 @@ export default class TabDemand extends Component {
                 }
                 onpress={{
                   view: () =>
-                    this.props.navigation.navigate("FieldHomeProductList", {objectId: store.objectId})
+                    this.props.navigation.navigate("FieldHomeProductList", {
+                      objectId: store.objectId
+                    })
                 }}
                 key={indexes}
               />

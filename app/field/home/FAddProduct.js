@@ -137,51 +137,27 @@ export default class CsAddProduct extends Component {
             processing_days: Number(this.state.data.processing_days)
         }
 
-        // const dataRelationADS = [
-        //Get objectID from available_delivery_services, then use it in parameter 2 at axios.post avalibale_delivery_services 
-        // ],
-
         const objectId = this.props.navigation.state.params.objectId;
 
         const dataRelationStores = [
             String(objectId)
         ]
 
-        // alert(JSON.stringify(data));
-
-        // axios.post(`${config.uri}/data/products`, data).then(result => {
-        //     if(result.data){
-        //         alert("Success!")
-        //     }
-        // })
-
 
         axios.post(`${config.uri}/data/products`, data).then(result => {
             if (result.data) {
                 axios.post(`${config.uri}/data/products/${result.data.objectId}/store:stores:1`, dataRelationStores).then(resultStoreRelation => {
                     if (resultStoreRelation.data) {
+                        alert("Success!");
                         this.props.navigation.goBack();
                     }
-                })
+                }).catch((e) => {
+                    alert(e.response.data.message)
+                });
             }
-        })
-
-        //Use this when object dataRelationASD and dataRelationStore is ready
-        // axios.post(`${uri}/data/products`, data).then(result => {
-        //     if(result.data){
-        //         axios.post(`${uri}/data/products/${result.data.objectId}/available_delivery_services:delivery_services:n`).then(result2 => {
-        //             if(result2.data){
-        //                 axios.post(`${uri}/data/products/${result.data.objectId}/store:stores:1`).then(result3 => {
-        //                     if(result3.data){
-        //                         this.allProduct(),
-        //                         alert("Succes!")
-        //                     }
-        //                 })
-        //             }
-        //         })
-        //     }
-        // })
-
+        }).catch((e) => {
+            alert(e.response.data.message)
+        });
     }
 
 
@@ -200,13 +176,17 @@ export default class CsAddProduct extends Component {
         })
     }
 
+    componentDidMount() {
+        const objectId = this.props.navigation.state.params.objectId;
+    }
+
     render() {
         return (
             <Container>
                 <Content style={{ backgroundColor: 'white' }}>
                     <Form>
                         <View style={{ width: '95%', alignSelf: 'center' }}>
-                            <Label style={styles.upperLimit}>Nama Produk (max 70 karakter)</Label>
+                            <Label style={styles.upperLimit}>Nama Produk (max 70 karakter) </Label>
                             <Item regular>
                                 <Input onChangeText={(name) => this.setState({ data: { ...this.state.data, name } })} />
                             </Item>
