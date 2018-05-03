@@ -20,7 +20,7 @@ import {
   Picker,
   Icon,
   List,
-  Thumbnail
+  Thumbnail,
 } from "native-base";
 import {
   StyleSheet,
@@ -29,7 +29,8 @@ import {
   StatusBar,
   Image,
   PixelRatio,
-  AppRegistry
+  AppRegistry,
+  Alert
 } from "react-native";
 import axios from "axios";
 import ImagePicker from "react-native-image-picker";
@@ -238,8 +239,14 @@ export default class CsAddStore extends Component {
               if (deliveryResult.data) {
                 axios.post(`${config.uri}/data/stores/${result.data.objectId}/categories:category_types:n`, categoryRelation).then(categoriesResult => {
                   if (categoriesResult.data) {
-                    alert("Success!");
-                    this.props.navigation.goBack();
+                    Alert.alert(
+                      '',
+                      'Success!',
+                      [
+                        { text: 'OK', onPress: () => this.props.navigation.goBack() },
+                      ],
+                      { cancelable: false }
+                    )
                   }
                 }).catch((e) => {
                   alert(e.response.data.message)

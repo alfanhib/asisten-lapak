@@ -19,16 +19,14 @@ import {
     CardItem,
     List,
 } from 'native-base';
-import { StyleSheet, View, Image, PixelRatio, TouchableOpacity, AppRegistry } from 'react-native';
+import { StyleSheet, View, Image, PixelRatio, TouchableOpacity, AppRegistry, Alert } from 'react-native';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import moment from "moment";
 
 import Footer from '../../../components/Footer'
 import config from "../../../config";
-import Row from '../../../components/Row'
-
-const uri = "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
+import Row from '../../../components/Row';
 
 export default class CsAddProduct extends Component {
 
@@ -148,8 +146,14 @@ export default class CsAddProduct extends Component {
             if (result.data) {
                 axios.post(`${config.uri}/data/products/${result.data.objectId}/store:stores:1`, dataRelationStores).then(resultStoreRelation => {
                     if (resultStoreRelation.data) {
-                        alert("Success!");
-                        this.props.navigation.goBack();
+                        Alert.alert(
+                            '',
+                            'Success!',
+                            [
+                                { text: 'OK', onPress: () => this.props.navigation.goBack() },
+                            ],
+                            { cancelable: false }
+                        )
                     }
                 }).catch((e) => {
                     alert(e.response.data.message)
