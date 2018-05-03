@@ -20,7 +20,7 @@ import {
   Picker,
   Icon,
   List,
-  Thumbnail
+  Thumbnail,
 } from "native-base";
 import {
   StyleSheet,
@@ -29,15 +29,13 @@ import {
   StatusBar,
   Image,
   PixelRatio,
-  AppRegistry
+  AppRegistry,
+  Alert
 } from "react-native";
 import axios from "axios";
 import ImagePicker from "react-native-image-picker";
 import Modal from "react-native-modal";
 import moment from "moment";
-
-const uri =
-  "https://api.backendless.com/A54546E5-6846-C9D4-FFAD-EFA9CB9E8A00/241A72A5-2C8A-1DB8-FFAF-0F46BA4A8100";
 
 import Footer from "../../../components/Footer";
 import config from "../../../config";
@@ -241,8 +239,14 @@ export default class CsAddStore extends Component {
               if (deliveryResult.data) {
                 axios.post(`${config.uri}/data/stores/${result.data.objectId}/categories:category_types:n`, categoryRelation).then(categoriesResult => {
                   if (categoriesResult.data) {
-                    alert("Success!");
-                    this.props.navigation.goBack();
+                    Alert.alert(
+                      '',
+                      'Success!',
+                      [
+                        { text: 'OK', onPress: () => this.props.navigation.goBack() },
+                      ],
+                      { cancelable: false }
+                    )
                   }
                 }).catch((e) => {
                   alert(e.response.data.message)

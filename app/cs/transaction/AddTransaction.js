@@ -22,7 +22,7 @@ import {
   List,
   Thumbnail
 } from "native-base";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
 import Modal from "react-native-modal";
 
@@ -124,15 +124,20 @@ export default class AddTransaction extends Component {
           if (resultTypeShipp.data) {
             axios.post(`${config.uri}/data/transactions/${result.data.objectId}/storeId:stores:1`, storeRelation).then(storeResult => {
               if (storeResult.data) {
-                alert("Success!");
-                this.props.navigation.goBack();
                 axios.post(`${config.uri}/data/orders`, this.state.orderData).then(resultOrder => {
                   if (resultOrder.data) {
                     axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/productId:products:1`, productRelation).then(productResult => {
                       if (productResult.data) {
                         axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/transactionId:transactions:1`, [String(result.data.objectId)]).then(transactionResult => {
                           if (transactionResult.data) {
-                            alert("Success!")
+                            Alert.alert(
+                              '',
+                              'Success!',
+                              [
+                                { text: 'OK', onPress: () => this.props.navigation.goBack() },
+                              ],
+                              { cancelable: false }
+                            )
                           }
                         }).catch((e) => {
                           alert(e.response.data.message)

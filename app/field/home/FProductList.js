@@ -18,7 +18,8 @@ import {
   CardItem,
   Body,
   Label,
-  Button
+  Button,
+  Spinner
 } from "native-base";
 import axios from "axios";
 
@@ -109,17 +110,17 @@ export default class FProductList extends Component {
                     />
                     <View style={{ flex: 6, paddingLeft: 10 }}>
                       <Text style={styles.rowTextTitle}>{store.name}</Text>
-                      <Text style={styles.rowSlogan}>{store.slogan}</Text>
+                      <Text style={styles.rowSlogan}>"{store.slogan}"</Text>
                       <Text style={styles.rowTextAsistName}>
-                        {store.assistant_cs.name}
+                        Customer: {store.assistant_cs.name}
                       </Text>
                       <Text style={styles.rowTextAsistName}>
-                        {store.assistant_outdoor.name}
+                        Outdoor: {store.assistant_outdoor.name}
                       </Text>
-                      <Text style={styles.rowTextAddress}>{store.address}</Text>
-                      <Text style={styles.rowWebsite}>{store.website}</Text>
+                      <Text style={styles.rowTextAddress}>Alamat: {store.address}</Text>
+                      <Text style={styles.rowWebsite}>Website: {store.website}</Text>
                       <Text style={styles.rowDescription}>
-                        {store.description}
+                        Deskripsi: {store.description}
                       </Text>
                     </View>
                   </View>
@@ -128,16 +129,13 @@ export default class FProductList extends Component {
               />
             ))}
 
-            {this.state.products.length == 0 ? (
+            {this.state.loading == false && this.state.stores.length == 0 ? (
               <View>
                 <Text style={{ textAlign: "center", marginTop: 10 }}>
-                  Product is Empty
+                  Product is not available
                 </Text>
-                <Label style={{ textAlign: "center" }}>List Product</Label>
               </View>
-            ) : null}
-
-            {this.state.products.map((product, indexes) => (
+            ) : this.state.products.map((product, indexes) => (
               <Row
                 body={
                   <View
@@ -153,9 +151,9 @@ export default class FProductList extends Component {
                     />
                     <View style={{ flex: 6, paddingLeft: 10 }}>
                       <Text style={styles.rowTextTitle}>{product.name}</Text>
-                      <Text style={styles.rowTextAsist}>{product.price}</Text>
+                      <Text style={styles.rowTextAsist}>Rp. {product.price}</Text>
                       <Text style={styles.rowTextAsistName}>
-                        {product.weight}
+                        {product.weight} Kg
                       </Text>
                       <Text style={styles.rowTextAddress}>
                         {product.description}
@@ -213,35 +211,43 @@ const styles = StyleSheet.create({
   },
   rowTextTitle: {
     fontSize: 20,
-    marginBottom: 5
+    marginBottom: 5,
+    alignSelf: "flex-start"
   },
   rowTextAsist: {
     fontSize: 13,
-    color: "#828282"
+    color: "#828282",
+    alignSelf: "flex-start"
   },
   rowTextAsistName: {
     fontSize: 15,
     marginBottom: 5,
-    color: "#4c4c4c"
+    color: "#4c4c4c",
+    alignSelf: "flex-start"
   },
   rowTextAddress: {
     fontSize: 15,
-    color: "#4c4c4c"
+    color: "#4c4c4c",
+    alignSelf: "flex-start"
   },
 
   rowSlogan: {
     fontSize: 15,
     marginBottom: 5,
-    color: "#4c4c4c"
+    color: "#4c4c4c",
+    alignSelf: "flex-start"
   },
 
   rowWebsite: {
     fontSize: 15,
-    marginBottom: 5
+    marginBottom: 5,
+    color: "#4c4c4c",
+    alignSelf: "flex-start"
   },
 
   rowDescription: {
-    fontSize: 13,
-    color: "#828282"
+    fontSize: 15,
+    color: "#828282",
+    alignSelf: "flex-start"
   }
 });
