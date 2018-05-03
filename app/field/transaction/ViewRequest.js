@@ -188,8 +188,8 @@ export default class ViewRequest extends Component {
       <Thumbnail circular size={50} source={{ uri: item.productId.image }} />
       <Body>
         <Text>{item.productId.name}</Text>
-        <Text note>{item.qty}</Text>
-        <Text note>{item.price}</Text>
+        <Text note>Jumlah: {item.qty}</Text>
+        <Text note>Harga per 1 barang: Rp. {item.price}</Text>
       </Body>
     </ListItem>
   );
