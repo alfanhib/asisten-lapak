@@ -20,7 +20,7 @@ import {
   Picker,
   Icon,
   List,
-  Thumbnail,
+  Thumbnail
 } from "native-base";
 import {
   StyleSheet,
@@ -132,10 +132,13 @@ export default class CsAddStore extends Component {
           type: "image/jpeg",
           name: "Photo"
         });
-        fetch(`${config.uri}/files/images/${moment().format("X")}.${fileName[1]}`, {
-          method: "post",
-          body: data
-        }).then(result => {
+        fetch(
+          `${config.uri}/files/images/${moment().format("X")}.${fileName[1]}`,
+          {
+            method: "post",
+            body: data
+          }
+        ).then(result => {
           this.setState({
             data: { ...this.state.data, logo: result.url }
           });
@@ -209,7 +212,7 @@ export default class CsAddStore extends Component {
     axios
       .get(
         `${
-        config.uri
+          config.uri
         }/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`
       )
       .then(result => {
@@ -231,44 +234,74 @@ export default class CsAddStore extends Component {
     // })
 
     //Use this if yout assistant object id is ready
-    axios.post(`${config.uri}/data/stores`, this.state.data).then(result => {
-      if (result.data) {
-        axios.post(`${config.uri}/data/stores/${result.data.objectId}/assistant_cs:Users:1`, assistantRelation).then(assistantResult => {
-          if (assistantResult.data) {
-            axios.post(`${config.uri}/data/stores/${result.data.objectId}/available_delivery_services:delivery_services:n`, deliveryRelation).then(deliveryResult => {
-              if (deliveryResult.data) {
-                axios.post(`${config.uri}/data/stores/${result.data.objectId}/categories:category_types:n`, categoryRelation).then(categoriesResult => {
-                  if (categoriesResult.data) {
-                    Alert.alert(
-                      '',
-                      'Success!',
-                      [
-                        { text: 'OK', onPress: () => this.props.navigation.goBack() },
-                      ],
-                      { cancelable: false }
-                    )
-                  }
-                }).catch((e) => {
-                  alert(e.response.data.message)
-                });
+    axios
+      .post(`${config.uri}/data/stores`, this.state.data)
+      .then(result => {
+        if (result.data) {
+          axios
+            .post(
+              `${config.uri}/data/stores/${
+                result.data.objectId
+              }/assistant_cs:Users:1`,
+              assistantRelation
+            )
+            .then(assistantResult => {
+              if (assistantResult.data) {
+                axios
+                  .post(
+                    `${config.uri}/data/stores/${
+                      result.data.objectId
+                    }/available_delivery_services:delivery_services:n`,
+                    deliveryRelation
+                  )
+                  .then(deliveryResult => {
+                    if (deliveryResult.data) {
+                      axios
+                        .post(
+                          `${config.uri}/data/stores/${
+                            result.data.objectId
+                          }/categories:category_types:n`,
+                          categoryRelation
+                        )
+                        .then(categoriesResult => {
+                          if (categoriesResult.data) {
+                            Alert.alert(
+                              "",
+                              "Success!",
+                              [
+                                {
+                                  text: "OK",
+                                  onPress: () => this.props.navigation.goBack()
+                                }
+                              ],
+                              { cancelable: false }
+                            );
+                          }
+                        })
+                        .catch(e => {
+                          alert(e.response.data.message);
+                        });
+                    }
+                  })
+                  .catch(e => {
+                    alert(e.response.data.message);
+                  });
               }
-            }).catch((e) => {
-              alert(e.response.data.message)
+            })
+            .catch(e => {
+              alert(e.response.data.message);
             });
-          }
-        }).catch((e) => {
-          alert(e.response.data.message)
-        });
-      }
-    }).catch((e) => {
-      alert(e.response.data.message)
-    });
+        }
+      })
+      .catch(e => {
+        alert(e.response.data.message);
+      });
   }
 
   componentDidMount() {
     this.allDeliveryServices(),
       this.setState({
-        data: { ...this.state.data, status: "Pending" }
+        data: { ...this.state.data, status: "pending" }
       });
     this.getAllCS();
     this.getAllCategoryTypes();
@@ -286,8 +319,8 @@ export default class CsAddStore extends Component {
                   {this.state.selectedName === null ? (
                     <Text>Please Select Customer</Text>
                   ) : (
-                      <Text>{this.state.selectedName}</Text>
-                    )}
+                    <Text>{this.state.selectedName}</Text>
+                  )}
                 </Body>
                 <Right>
                   <Icon name="arrow-dropdown" />
@@ -357,29 +390,29 @@ export default class CsAddStore extends Component {
                 <Text style={styles.fileChooser}>TAMBAHKAN FOTO</Text>
               </Button>
             ) : (
+              <View>
                 <View>
-                  <View>
-                    <Button
-                      transparent
-                      onPress={this.selectPhotoTapped.bind(this)}
-                    >
-                      <Text style={styles.fileChooser}>GANTI FOTO</Text>
-                    </Button>
-                  </View>
-                  <View
-                    style={[
-                      styles.avatar,
-                      styles.avatarContainer,
-                      { marginBottom: 20 }
-                    ]}
+                  <Button
+                    transparent
+                    onPress={this.selectPhotoTapped.bind(this)}
                   >
-                    <Image
-                      style={styles.avatar}
-                      source={this.state.imageSource}
-                    />
-                  </View>
+                    <Text style={styles.fileChooser}>GANTI FOTO</Text>
+                  </Button>
                 </View>
-              )}
+                <View
+                  style={[
+                    styles.avatar,
+                    styles.avatarContainer,
+                    { marginBottom: 20 }
+                  ]}
+                >
+                  <Image
+                    style={styles.avatar}
+                    source={this.state.imageSource}
+                  />
+                </View>
+              </View>
+            )}
 
             <Label style={styles.upperLimit}>Deskripsi</Label>
             <Textarea
@@ -623,5 +656,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#b4424b",
     alignSelf: "center",
     justifyContent: "center"
-  },
+  }
 });

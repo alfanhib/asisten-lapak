@@ -289,7 +289,7 @@ export default class CsAddStore extends Component {
   componentDidMount() {
     this.allDeliveryServices(),
       this.setState({
-        data: { ...this.state.data, status: "Pending" }
+        data: { ...this.state.data, status: "pending" }
       });
     this.getAllUser();
     this.getAllCategoryTypes();
