@@ -30,6 +30,7 @@ import Row from "../../../components/Row";
 export default class FProductList extends Component {
   state = {
     refreshing: true,
+    loading: true,
     stores: [],
     products: []
   };
@@ -45,11 +46,15 @@ export default class FProductList extends Component {
         axios
           .get(
             `${
-            config.uri
+              config.uri
             }/data/stores?where=status%20%3D%20'pending'&loadRelations=assistant_outdoor%2Cassistant_cs&where=assistant_outdoor.objectId%20%3D%20'${result}'&where=objectId%20%3D%20'${objectId}'`
           )
           .then(stores => {
-            this.setState({ stores: stores.data, refreshing: false });
+            this.setState({
+              stores: stores.data,
+              refreshing: false,
+              loading: false
+            });
           });
       }
     });
@@ -63,14 +68,15 @@ export default class FProductList extends Component {
     axios
       .get(
         `${
-        config.uri
+          config.uri
         }/data/products?where=store.objectId%20%3D%20'${objectId}'&loadRelations=store`
       )
       .then(result => {
         if (result.data) {
           this.setState({
             products: result.data,
-            refreshing: false
+            refreshing: false,
+            loading: false
           });
         }
       });
@@ -79,6 +85,33 @@ export default class FProductList extends Component {
   componentDidMount() {
     this.getAllData();
     this.getAllProduct();
+  }
+
+  activateStore() {
+    objectId = this.props.navigation.state.params.objectId;
+
+    axios
+      .put(
+        `${config.uri}/data/bulk/stores?where=objectId%20%3D%20'${objectId}'`,
+        {
+          status: "active"
+        }
+      )
+      .then(result => {
+        if (result.data) {
+          Alert.alert(
+            "",
+            "Store status has been changed!",
+            [
+              {
+                text: "OK",
+                onPress: () => this.props.navigation.goBack()
+              }
+            ],
+            { cancelable: false }
+          );
+        }
+      });
   }
 
   render() {
@@ -117,11 +150,18 @@ export default class FProductList extends Component {
                       <Text style={styles.rowTextAsistName}>
                         Outdoor: {store.assistant_outdoor.name}
                       </Text>
-                      <Text style={styles.rowTextAddress}>Alamat: {store.address}</Text>
-                      <Text style={styles.rowWebsite}>Website: {store.website}</Text>
+                      <Text style={styles.rowTextAddress}>
+                        Alamat: {store.address}
+                      </Text>
+                      <Text style={styles.rowWebsite}>
+                        Website: {store.website}
+                      </Text>
                       <Text style={styles.rowDescription}>
                         Deskripsi: {store.description}
                       </Text>
+                      <Button full onPress={() => this.activateStore()} style={{color="#b4424b"}}>
+                        <Text>Aktifkan Toko</Text>
+                      </Button>
                     </View>
                   </View>
                 }
@@ -129,41 +169,43 @@ export default class FProductList extends Component {
               />
             ))}
 
-            {this.state.loading == false && this.state.stores.length == 0 ? (
-              <View>
-                <Text style={{ textAlign: "center", marginTop: 10 }}>
-                  Product is not available
-                </Text>
-              </View>
-            ) : this.state.products.map((product, indexes) => (
-              <Row
-                body={
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      paddingLeft: 20,
-                      paddingRight: 20
-                    }}
-                  >
-                    <Image
-                      style={styles.rowImage}
-                      source={{ uri: product.image }}
-                    />
-                    <View style={{ flex: 6, paddingLeft: 10 }}>
-                      <Text style={styles.rowTextTitle}>{product.name}</Text>
-                      <Text style={styles.rowTextAsist}>Rp. {product.price}</Text>
-                      <Text style={styles.rowTextAsistName}>
-                        {product.weight} Kg
-                      </Text>
-                      <Text style={styles.rowTextAddress}>
-                        {product.description}
-                      </Text>
+            {this.state.loading == false && this.state.products.length == 0 ? (
+              <Text style={{ textAlign: "center", marginTop: 10 }}>
+                Product is not available
+              </Text>
+            ) : (
+              this.state.products.map((product, indexes) => (
+                <Row
+                  body={
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        paddingLeft: 20,
+                        paddingRight: 20
+                      }}
+                    >
+                      <Image
+                        style={styles.rowImage}
+                        source={{ uri: product.image }}
+                      />
+                      <View style={{ flex: 6, paddingLeft: 10 }}>
+                        <Text style={styles.rowTextTitle}>{product.name}</Text>
+                        <Text style={styles.rowTextAsist}>
+                          Rp. {product.price}
+                        </Text>
+                        <Text style={styles.rowTextAsistName}>
+                          {product.weight} Kg
+                        </Text>
+                        <Text style={styles.rowTextAddress}>
+                          {product.description}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                }
-                key={indexes}
-              />
-            ))}
+                  }
+                  key={indexes}
+                />
+              ))
+            )}
           </Content>
         </ScrollView>
         <Fab
