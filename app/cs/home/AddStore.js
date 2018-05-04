@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, PixelRatio, Image } from "react-native";
+import { StyleSheet, View, PixelRatio, Image, Alert } from "react-native";
 import {
   Content,
   Form,
@@ -59,9 +59,7 @@ export default class CsAddStore extends Component {
       }
     ],
 
-    data: {
-      status: "pending"
-    },
+    data: {},
     deliveryServices: [],
 
     delivery_services: [],
@@ -125,6 +123,22 @@ export default class CsAddStore extends Component {
     });
   }
 
+  getAllUser() {
+    axios
+      .get(`${config.uri}/data/Users?where=role%20%3D%20'outdoor'`)
+      .then(result => {
+        this.setState({ users: result.data });
+      });
+  }
+
+  getAllCategoryTypes() {
+    axios
+      .get(`${config.uri}/data/category_types?sortBy=created%20desc`)
+      .then(result => {
+        this.setState({ typesCategory: result.data });
+      });
+  }
+
   radioProductStts(name, id) {
     this.setState({
       selectedStatus: name,
@@ -150,24 +164,45 @@ export default class CsAddStore extends Component {
     }
   }
 
+  addCheckCategories(set) {
+    if (!this.state.check.includes(set)) {
+      getCheck = this.state.check;
+      getCheck.push(set);
+      this.setState({
+        check: getCheck,
+        check1: getCheck,
+        objectIdCategories: getCheck
+      });
+    } else {
+      geCheck = this.state.check;
+      geCheck = geCheck.filter(item => item !== set);
+      this.setState({
+        check: geCheck,
+        objectIdCategories: geCheck
+      });
+    }
+  }
+
   addCheckDeliveryServices(set) {
     if (!this.state.checkk.includes(set)) {
       getCheck = this.state.checkk;
       getCheck.push(set);
       this.setState({
         checkk: getCheck,
-        check2: getCheck
+        check2: getCheck,
+        delivery_services: getCheck
       });
     } else {
       geCheck = this.state.checkk;
       geCheck = geCheck.filter(item => item !== set);
       this.setState({
-        checkk: geCheck
+        checkk: geCheck,
+        delivery_services: geCheck
       });
     }
   }
 
-  getAllDeliveryServices() {
+  allDeliveryServices() {
     axios
       .get(
         `${
@@ -178,28 +213,6 @@ export default class CsAddStore extends Component {
         this.setState({
           deliveryServices: result.data
         });
-      });
-  }
-
-  getAllCategory() {
-    axios
-      .get(
-        `${
-          config.uri
-        }/data/category_types?pageSize=100&offset=0&sortBy=created%20desc`
-      )
-      .then(result => {
-        this.setState({
-          typesCategory: result.data
-        });
-      });
-  }
-
-  getAllUser() {
-    axios
-      .get(`${config.uri}/data/Users?where=role%20%3D%20'outdoor'`)
-      .then(result => {
-        this.setState({ users: result.data });
       });
   }
 
@@ -240,8 +253,17 @@ export default class CsAddStore extends Component {
                         )
                         .then(categoriesResult => {
                           if (categoriesResult.data) {
-                            alert("Success!");
-                            this.props.navigation.goBack();
+                            Alert.alert(
+                              "",
+                              "Success!",
+                              [
+                                {
+                                  text: "ok",
+                                  onPress: () => this.props.navigation.goBack()
+                                }
+                              ],
+                              { cancelable: false }
+                            );
                           }
                         })
                         .catch(e => {
@@ -262,13 +284,15 @@ export default class CsAddStore extends Component {
       .catch(e => {
         alert(e.response.data.message);
       });
-    this.props.navigation.goBack();
   }
 
   componentDidMount() {
-    this.getAllDeliveryServices();
-    this.getAllCategory();
+    this.allDeliveryServices(),
+      this.setState({
+        data: { ...this.state.data, status: "pending" }
+      });
     this.getAllUser();
+    this.getAllCategoryTypes();
   }
 
   render() {

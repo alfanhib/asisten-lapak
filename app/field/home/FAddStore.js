@@ -160,7 +160,11 @@ export default class CsAddStore extends Component {
 
   getAllCategoryTypes() {
     axios
-      .get(`${config.uri}/data/category_types?pageSize=100&offset=0&sortBy=created%20desc`)
+      .get(
+        `${
+          config.uri
+        }/data/category_types?pageSize=100&offset=0&sortBy=created%20desc`
+      )
       .then(result => {
         this.setState({ typesCategory: result.data, loading: false });
       });
@@ -317,7 +321,7 @@ export default class CsAddStore extends Component {
   componentDidMount() {
     this.allDeliveryServices(),
       this.setState({
-        data: { ...this.state.data, status: "pending" }
+        data: { ...this.state.data, status: "Pending" }
       });
     this.getAllCS();
     this.getAllCategoryTypes();

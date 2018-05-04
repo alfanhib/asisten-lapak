@@ -99,7 +99,17 @@ export default class FProductList extends Component {
       )
       .then(result => {
         if (result.data) {
-          alert("Store status has been changed!");
+          Alert.alert(
+            "",
+            "Store status has been changed!",
+            [
+              {
+                text: "OK",
+                onPress: () => this.props.navigation.goBack()
+              }
+            ],
+            { cancelable: false }
+          );
         }
       });
   }
