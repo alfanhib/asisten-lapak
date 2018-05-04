@@ -159,7 +159,7 @@ export default class FProductList extends Component {
                       <Text style={styles.rowDescription}>
                         Deskripsi: {store.description}
                       </Text>
-                      <Button full onPress={() => this.activateStore()}>
+                      <Button full onPress={() => this.activateStore()} style={{color="#b4424b"}}>
                         <Text>Aktifkan Toko</Text>
                       </Button>
                     </View>
