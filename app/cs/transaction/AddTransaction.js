@@ -20,9 +20,16 @@ import {
   Picker,
   Icon,
   List,
-  Thumbnail
+  Thumbnail,
+  Spinner
 } from "native-base";
-import { StyleSheet, View, TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView
+} from "react-native";
 import axios from "axios";
 import Modal from "react-native-modal";
 
@@ -30,9 +37,8 @@ import Footer from "../../../components/Footer";
 import config from "../../../config";
 
 export default class AddTransaction extends Component {
-
-
   state = {
+    loading: true,
     selectedTypeShipping: "",
     selectedTypePacking: "",
 
@@ -80,12 +86,13 @@ export default class AddTransaction extends Component {
     axios
       .get(
         `${
-        config.uri
+          config.uri
         }/data/delivery_services?pageSize=100&sortBy=created%20desc`
       )
       .then(result => {
         this.setState({
-          deliveryServices: result.data
+          deliveryServices: result.data,
+          loading: false
         });
       });
   }
@@ -94,19 +101,28 @@ export default class AddTransaction extends Component {
     axios.get(`${config.uri}/data/stores?sortBy=name%20desc`).then(result => {
       this.getProducts();
       this.setState({
-        stores: result.data
-      })
-    })
+        stores: result.data,
+        loading: false
+      });
+    });
   }
 
   getProducts(storeObjectId_) {
-    axios.get(`${config.uri}/data/products?where=store.objectId%20%3D%20'${storeObjectId_}'`).then(result => {
-      this.setState({
-        products: result.data
+    axios
+      .get(
+        `${
+          config.uri
+        }/data/products?where=store.objectId%20%3D%20'${storeObjectId_}'`
+      )
+      .then(result => {
+        this.setState({
+          products: result.data,
+          loading: false
+        });
+      })
+      .catch(e => {
+        alert(e.response.data.message);
       });
-    }).catch((e) => {
-      alert(e.response.data.message)
-    });
   }
 
   handleSubmit() {
@@ -118,53 +134,105 @@ export default class AddTransaction extends Component {
 
     const transactionRelation = [this.state.transactionId];
 
-    axios.post(`${config.uri}/data/transactions`, this.state.data).then(result => {
-      if (result.data) {
-        axios.post(`${config.uri}/data/transactions/${result.data.objectId}/typeOfShipping:delivery_services:1`, typeOfShipp).then(resultTypeShipp => {
-          if (resultTypeShipp.data) {
-            axios.post(`${config.uri}/data/transactions/${result.data.objectId}/storeId:stores:1`, storeRelation).then(storeResult => {
-              if (storeResult.data) {
-                axios.post(`${config.uri}/data/orders`, this.state.orderData).then(resultOrder => {
-                  if (resultOrder.data) {
-                    axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/productId:products:1`, productRelation).then(productResult => {
-                      if (productResult.data) {
-                        axios.post(`${config.uri}/data/orders/${resultOrder.data.objectId}/transactionId:transactions:1`, [String(result.data.objectId)]).then(transactionResult => {
-                          if (transactionResult.data) {
-                            Alert.alert(
-                              '',
-                              'Success!',
-                              [
-                                { text: 'OK', onPress: () => this.props.navigation.goBack() },
-                              ],
-                              { cancelable: false }
-                            )
+    axios
+      .post(`${config.uri}/data/transactions`, this.state.data)
+      .then(result => {
+        if (result.data) {
+          axios
+            .post(
+              `${config.uri}/data/transactions/${
+                result.data.objectId
+              }/typeOfShipping:delivery_services:1`,
+              typeOfShipp
+            )
+            .then(resultTypeShipp => {
+              if (resultTypeShipp.data) {
+                axios
+                  .post(
+                    `${config.uri}/data/transactions/${
+                      result.data.objectId
+                    }/storeId:stores:1`,
+                    storeRelation
+                  )
+                  .then(storeResult => {
+                    if (storeResult.data) {
+                      axios
+                        .post(`${config.uri}/data/orders`, this.state.orderData)
+                        .then(resultOrder => {
+                          if (resultOrder.data) {
+                            axios
+                              .post(
+                                `${config.uri}/data/orders/${
+                                  resultOrder.data.objectId
+                                }/productId:products:1`,
+                                productRelation
+                              )
+                              .then(productResult => {
+                                if (productResult.data) {
+                                  axios
+                                    .post(
+                                      `${config.uri}/data/orders/${
+                                        resultOrder.data.objectId
+                                      }/transactionId:transactions:1`,
+                                      [String(result.data.objectId)]
+                                    )
+                                    .then(transactionResult => {
+                                      if (transactionResult.data) {
+                                        Alert.alert(
+                                          "",
+                                          "Success!",
+                                          [
+                                            {
+                                              text: "OK",
+                                              onPress: () =>
+                                                this.props.navigation.goBack()
+                                            }
+                                          ],
+                                          { cancelable: false }
+                                        );
+                                      }
+                                    })
+                                    .catch(e => {
+                                      alert(e.response.data.message);
+                                    });
+                                }
+                              })
+                              .catch(e => {
+                                alert(e.response.data.message);
+                              });
                           }
-                        }).catch((e) => {
-                          alert(e.response.data.message)
+                        })
+                        .catch(e => {
+                          alert(e.response.data.message);
                         });
-                      }
-                    }).catch((e) => {
-                      alert(e.response.data.message)
-                    });
-                  }
-                }).catch((e) => {
-                  alert(e.response.data.message)
-                });
+                    }
+                  })
+                  .catch(e => {
+                    alert(e.response.data.message);
+                  });
               }
-            }).catch((e) => {
-              alert(e.response.data.message)
+            })
+            .catch(e => {
+              alert(e.response.data.message);
             });
-          }
-        }).catch((e) => {
-          alert(e.response.data.message)
-        });
-      }
-    }).catch((e) => {
-      alert(e.response.data.message)
-    });
-
-
+        }
+      })
+      .catch(e => {
+        alert(e.response.data.message);
+      });
   }
+
+  _handleScrollTo = p => {
+    if (this.scrollViewRef) {
+      this.scrollViewRef.scrollTo(p);
+    }
+  };
+
+  _handleOnScroll = event => {
+    this.setState({
+      scrollOffset: event.nativeEvent.contentOffset.y
+    });
+  };
 
   checkRadioShipping(name, id) {
     this.setState({
@@ -187,9 +255,7 @@ export default class AddTransaction extends Component {
     this.allStores();
     this.setState({
       data: { ...this.state.data, status: "pending", deadlineDate: new Date() }
-    })
-
-
+    });
   }
 
   getProductsFromStore(name, objectId) {
@@ -212,252 +278,309 @@ export default class AddTransaction extends Component {
     return (
       <Container>
         <Content padder style={{ backgroundColor: "white" }}>
-          <Form>
-            <Label style={styles.upperLimit}>Pilih toko </Label>
-            <List style={{ marginLeft: -30 }}>
-              <ListItem onPress={() => this.setState({ visibleModal: true })}>
-                <Body>
-                  {this.state.selectedName === null ? (
-                    <Text>Please Select Store</Text>
-                  ) : (
+          {this.state.loading == true ? (
+            <Spinner color="red" />
+          ) : (
+            <Form>
+              <Label style={styles.upperLimit}>Pilih toko </Label>
+              <List style={{ marginLeft: -30 }}>
+                <ListItem onPress={() => this.setState({ visibleModal: true })}>
+                  <Body>
+                    {this.state.selectedName === null ? (
+                      <Text>Please Select Store</Text>
+                    ) : (
                       <Text>{this.state.selectedName}</Text>
                     )}
-                </Body>
-                <Right>
-                  <Icon name="arrow-dropdown" />
-                </Right>
-              </ListItem>
-            </List>
-            <Modal isVisible={this.state.visibleModal}>
-              <View style={styles.modalContent}>
-                <List>
-                  {this.state.stores.length == 0 ? (
-                    <View>
-                      <Text style={{ textAlign: "center" }}>Store is not available</Text>
-                    </View>
-                  ) : this.state.stores.map(store => {
-                    return (
-                      <ListItem
-                        key={store.objectId}
-                        onPress={() => this.getProductsFromStore(store.name, store.objectId)}
-                      >
-                        <Thumbnail
-                          square
-                          size={5}
-                          source={{ uri: store.logo }}
-                          style={{ marginRight: 20 }}
-                        />
-                        <Body>
-                          <Text>{store.name}</Text>
-                          <Text note>{store.address}</Text>
-                          <Text note>{store.description}</Text>
-                        </Body>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-                <Button
-                  style={styles.button}
-                  onPress={() => this.setState({ visibleModal: false })}
+                  </Body>
+                  <Right>
+                    <Icon name="arrow-dropdown" />
+                  </Right>
+                </ListItem>
+              </List>
+              <Modal
+                isVisible={this.state.visibleModal}
+                onSwipe={() => this.setState({ visibleModal: null })}
+                swipeDirection="down"
+                scrollTo={this._handleScrollTo}
+                scrollOffset={this.state.scrollOffset}
+                scrollOffsetMax={400 - 300}
+              >
+                <View style={styles.modalContent}>
+                  <ScrollView>
+                    <List>
+                      {this.state.stores.length == 0 ? (
+                        <View>
+                          <Text style={{ textAlign: "center" }}>
+                            Store is not available
+                          </Text>
+                        </View>
+                      ) : (
+                        this.state.stores.map(store => {
+                          return (
+                            <ListItem
+                              key={store.objectId}
+                              onPress={() =>
+                                this.getProductsFromStore(
+                                  store.name,
+                                  store.objectId
+                                )
+                              }
+                            >
+                              <Thumbnail
+                                square
+                                size={5}
+                                source={{ uri: store.logo }}
+                                style={{ marginRight: 20 }}
+                              />
+                              <Body>
+                                <Text>{store.name}</Text>
+                                <Text note>{store.address}</Text>
+                                <Text note>{store.description}</Text>
+                              </Body>
+                            </ListItem>
+                          );
+                        })
+                      )}
+                    </List>
+                  </ScrollView>
+                  <Button
+                    style={styles.button}
+                    onPress={() => this.setState({ visibleModal: false })}
+                  >
+                    <Text>Close</Text>
+                  </Button>
+                </View>
+              </Modal>
+              {/* <Label>Try</Label>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="ios-arrow-down-outline" />}
+                headerBackButtonText="Baaack!"
+                style={{ width: undefined }}
+                selectedValue={this.state.selected1}
+                onValueChange={this.onValueChange.bind(this)}
+              >
+                {this.state.stores.map((store, index) => (
+                  <Picker.Item label={store.name} value={index} key={index} />
+                ))}
+              </Picker> */}
+              <Label style={styles.upperLimit}>Produk Pesanan</Label>
+              <List style={{ marginLeft: -30 }}>
+                <ListItem
+                  onPress={() => this.setState({ visibleModalProduct: true })}
                 >
-                  <Text>Close</Text>
-                </Button>
-              </View>
-            </Modal>
-            <Label style={styles.upperLimit}>Produk Pesanan</Label>
-            {/* <Input
-                onChangeText={orderProduct =>
-                  this.setState({ data: { ...this.state.data, orderProduct } })
-                }
-              /> */}
-
-            <List style={{ marginLeft: -30 }}>
-              <ListItem onPress={() => this.setState({ visibleModalProduct: true })}>
-                <Body>
-                  {this.state.selectedNameProduct === null ? (
-                    <Text>Please Select Product</Text>
-                  ) : (
+                  <Body>
+                    {this.state.selectedNameProduct === null ? (
+                      <Text>Please Select Product</Text>
+                    ) : (
                       <Text>{this.state.selectedNameProduct}</Text>
                     )}
-                </Body>
-                <Right>
-                  <Icon name="arrow-dropdown" />
-                </Right>
-              </ListItem>
-            </List>
-            <Modal isVisible={this.state.visibleModalProduct}>
-              <View style={styles.modalContent}>
-                <List>
-                  {this.state.products.length == 0 ? (
-                    <View>
-                      <Text style={{ textAlign: "center" }}>Product is not available</Text>
-                    </View>
-                  ) : this.state.products.map(product => {
-                    return (
-
-                      <ListItem
-                        key={product.objectId}
-                        onPress={() =>
-                          this.setState({
-                            selectedNameProduct: product.name,
-                            productObjectId: product.objectId,
-                            visibleModalProduct: false,
-                            productPrice: product.price,
-                            productId: product.objectId,
-                            data: { ...this.state.data, orderProduct: product.name },
-                            orderData: { ...this.state.orderData, price: Number(product.price) }
-                          })
-                        }
-                      >
-                        <Thumbnail
-                          square
-                          size={5}
-                          source={{ uri: product.image }}
-                          style={{ marginRight: 20 }}
-                        />
-                        <Body>
-                          <Text>{product.name}</Text>
-                          <Text note>{product.address}</Text>
-                          <Text note>{product.description}</Text>
-                        </Body>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-                <Button
-                  style={styles.button}
-                  onPress={() => this.setState({ visibleModalProduct: false })}
-                >
-                  <Text>Close</Text>
-                </Button>
-              </View>
-            </Modal>
-
-            <Label style={styles.upperLimit}>Stock Availability</Label>
-            <Item regular>
-              <Input
-                onChangeText={stockAvailability =>
-                  this.setState({
-                    data: { ...this.state.data, stockAvailability, total: this.state.productPrice * stockAvailability },
-                    orderData: { ...this.state.orderData, qty: Number(stockAvailability) }
-                  })
-                }
-                keyboardType="numeric"
-              />
-            </Item>
-
-            <Label style={styles.upperLimit}>Special Request</Label>
-            <Item regular>
-              <Input
-                onChangeText={specialRequest =>
-                  this.setState({
-                    data: { ...this.state.data, specialRequest }
-                  })
-                }
-              />
-            </Item>
-
-            <Label style={styles.upperLimit}>Order Number</Label>
-            <Item regular>
-              <Input
-                onChangeText={orderNumber =>
-                  this.setState({ data: { ...this.state.data, orderNumber: Number(orderNumber) } })
-                }
-                keyboardType="numeric"
-              />
-            </Item>
-
-            <Label style={styles.upperLimit}>Type of Shipping</Label>
-
-            {this.state.deliveryServices.map(item => {
-              return (
-                <ListItem key={item.objectId} style={styles.items}>
-                  <Radio
-                    selected={
-                      item.name == this.state.selectedTypeShipping
-                        ? true
-                        : false
-                    }
+                  </Body>
+                  <Right>
+                    <Icon name="arrow-dropdown" />
+                  </Right>
+                </ListItem>
+              </List>
+              <Modal isVisible={this.state.visibleModalProduct}>
+                <View style={styles.modalContent}>
+                  <List>
+                    {this.state.products.length == 0 ? (
+                      <View>
+                        <Text style={{ textAlign: "center" }}>
+                          Product is not available
+                        </Text>
+                      </View>
+                    ) : (
+                      this.state.products.map(product => {
+                        return (
+                          <ListItem
+                            key={product.objectId}
+                            onPress={() =>
+                              this.setState({
+                                selectedNameProduct: product.name,
+                                productObjectId: product.objectId,
+                                visibleModalProduct: false,
+                                productPrice: product.price,
+                                productId: product.objectId,
+                                data: {
+                                  ...this.state.data,
+                                  orderProduct: product.name
+                                },
+                                orderData: {
+                                  ...this.state.orderData,
+                                  price: Number(product.price)
+                                }
+                              })
+                            }
+                          >
+                            <Thumbnail
+                              square
+                              size={5}
+                              source={{ uri: product.image }}
+                              style={{ marginRight: 20 }}
+                            />
+                            <Body>
+                              <Text>{product.name}</Text>
+                              <Text note>{product.address}</Text>
+                              <Text note>{product.description}</Text>
+                            </Body>
+                          </ListItem>
+                        );
+                      })
+                    )}
+                  </List>
+                  <Button
+                    style={styles.button}
                     onPress={() =>
-                      this.checkRadioShipping(item.name, item.objectId)
+                      this.setState({ visibleModalProduct: false })
                     }
-                  />
-                  <Body>
-                    <Label style={styles.labelSelect}>{item.name}</Label>
-                  </Body>
-                </ListItem>
-              );
-            })}
+                  >
+                    <Text>Close</Text>
+                  </Button>
+                </View>
+              </Modal>
 
-            <Label style={styles.upperLimit}>Type of Packing</Label>
+              <Label style={styles.upperLimit}>Stock Availability</Label>
+              <Item regular>
+                <Input
+                  onChangeText={stockAvailability =>
+                    this.setState({
+                      data: {
+                        ...this.state.data,
+                        stockAvailability,
+                        total: this.state.productPrice * stockAvailability
+                      },
+                      orderData: {
+                        ...this.state.orderData,
+                        qty: Number(stockAvailability)
+                      }
+                    })
+                  }
+                  keyboardType="numeric"
+                />
+              </Item>
 
-            {this.state.itemsPacking.map((item, index) => {
-              return (
-                <ListItem key={item.name} style={styles.items}>
-                  <Radio
-                    selected={
-                      item.name == this.state.selectedTypePacking ? true : false
-                    }
-                    onPress={() => this.checkRadioPacking(item.name, item.id)}
-                  />
-                  <Body>
-                    <Label style={styles.labelSelect}>{item.name}</Label>
-                  </Body>
-                </ListItem>
-              );
-            })}
+              <Label style={styles.upperLimit}>Special Request</Label>
+              <Item regular>
+                <Input
+                  onChangeText={specialRequest =>
+                    this.setState({
+                      data: { ...this.state.data, specialRequest }
+                    })
+                  }
+                />
+              </Item>
 
-            <Label style={styles.upperLimit}>Name of Customer</Label>
-            <Item regular>
-              <Input
-                onChangeText={name =>
-                  this.setState({ data: { ...this.state.data, name } })
+              <Label style={styles.upperLimit}>Order Number</Label>
+              <Item regular>
+                <Input
+                  onChangeText={orderNumber =>
+                    this.setState({
+                      data: {
+                        ...this.state.data,
+                        orderNumber: Number(orderNumber)
+                      }
+                    })
+                  }
+                  keyboardType="numeric"
+                />
+              </Item>
+
+              <Label style={styles.upperLimit}>Type of Shipping</Label>
+
+              {this.state.deliveryServices.map(item => {
+                return (
+                  <ListItem key={item.objectId} style={styles.items}>
+                    <Radio
+                      selected={
+                        item.name == this.state.selectedTypeShipping
+                          ? true
+                          : false
+                      }
+                      onPress={() =>
+                        this.checkRadioShipping(item.name, item.objectId)
+                      }
+                    />
+                    <Body>
+                      <Label style={styles.labelSelect}>{item.name}</Label>
+                    </Body>
+                  </ListItem>
+                );
+              })}
+
+              <Label style={styles.upperLimit}>Type of Packing</Label>
+
+              {this.state.itemsPacking.map((item, index) => {
+                return (
+                  <ListItem key={item.name} style={styles.items}>
+                    <Radio
+                      selected={
+                        item.name == this.state.selectedTypePacking
+                          ? true
+                          : false
+                      }
+                      onPress={() => this.checkRadioPacking(item.name, item.id)}
+                    />
+                    <Body>
+                      <Label style={styles.labelSelect}>{item.name}</Label>
+                    </Body>
+                  </ListItem>
+                );
+              })}
+
+              <Label style={styles.upperLimit}>Name of Customer</Label>
+              <Item regular>
+                <Input
+                  onChangeText={name =>
+                    this.setState({ data: { ...this.state.data, name } })
+                  }
+                />
+              </Item>
+
+              <Label style={styles.upperLimit}>Customer Phone Number</Label>
+              <Item regular>
+                <Input
+                  onChangeText={mobile_phone =>
+                    this.setState({
+                      data: { ...this.state.data, mobile_phone }
+                    })
+                  }
+                  keyboardType="numeric"
+                />
+              </Item>
+
+              <Label style={styles.upperLimit}>Customer Address</Label>
+              <Textarea
+                rowSpan={5}
+                bordered
+                onChangeText={address =>
+                  this.setState({ data: { ...this.state.data, address } })
                 }
               />
-            </Item>
 
-            <Label style={styles.upperLimit}>Customer Phone Number</Label>
-            <Item regular>
-              <Input
-                onChangeText={mobile_phone =>
-                  this.setState({ data: { ...this.state.data, mobile_phone } })
-                }
-                keyboardType="numeric"
-              />
-            </Item>
+              <Label style={styles.upperLimit}>Nearest Courier Location</Label>
+              <Item regular>
+                <Input
+                  onChangeText={nearestCourier =>
+                    this.setState({
+                      data: { ...this.state.data, nearestCourier }
+                    })
+                  }
+                />
+              </Item>
 
-            <Label style={styles.upperLimit}>Customer Address</Label>
-            <Textarea
-              rowSpan={5}
-              bordered
-              onChangeText={address =>
-                this.setState({ data: { ...this.state.data, address } })
-              }
-            />
-
-            <Label style={styles.upperLimit}>Nearest Courier Location</Label>
-            <Item regular>
-              <Input
-                onChangeText={nearestCourier =>
-                  this.setState({
-                    data: { ...this.state.data, nearestCourier }
-                  })
-                }
-              />
-            </Item>
-
-            <ListItem>
-              <Button
-                block
-                style={styles.submitBtn}
-                onPress={() => this.handleSubmit()}
-              >
-                <Text>Kirim</Text>
-              </Button>
-            </ListItem>
-          </Form>
+              <ListItem>
+                <Button
+                  block
+                  style={styles.submitBtn}
+                  onPress={() => this.handleSubmit()}
+                >
+                  <Text>Kirim</Text>
+                </Button>
+              </ListItem>
+            </Form>
+          )}
         </Content>
-
         <Footer
           data={{
             activeTransaction: true,
@@ -517,5 +640,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#b4424b",
     alignSelf: "center",
     justifyContent: "center"
-  },
+  }
 });
