@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, Image, ScrollView, RefreshControl, AsyncStorage } from "react-native";
+import {
+  StyleSheet,
+  Image,
+  ScrollView,
+  RefreshControl,
+  AsyncStorage
+} from "react-native";
 import { Container, Content, Fab, Icon, Text, View } from "native-base";
 
 import axios from "axios";
@@ -13,7 +19,12 @@ export default class TabDemand extends Component {
 
     AsyncStorage.getItem("objectId", (err, result) => {
       if (result) {
-        axios.get(`${config.uri}/data/stores?where=status%3D'pending'%20and%20assistant_outdoor.objectId%3D'${result}'&loadRelations=available_delivery_services%2Cassistant_cs`)
+        axios
+          .get(
+            `${
+              config.uri
+            }/data/stores?where=status%3D'pending'%20and%20assistant_outdoor.objectId%3D'${result}'&loadRelations=available_delivery_services%2Cassistant_cs`
+          )
           .then(stores => {
             this.setState({ stores: stores.data, refreshing: false });
           });
@@ -43,7 +54,6 @@ export default class TabDemand extends Component {
           }
         >
           <Content>
-
             {this.state.loading == false && this.state.stores.length == 0 ? (
               <Text style={{ textAlign: "center", marginTop: 10 }}>
                 No data
@@ -67,16 +77,21 @@ export default class TabDemand extends Component {
                     <View style={{ flex: 6, paddingLeft: 10 }}>
                       <Text style={styles.rowTextTitle}>{store.name}</Text>
                       <Text style={styles.rowTextAsist}>Asisten CS</Text>
-                      <Text style={styles.rowTextAsistName}>{store.assistant_cs.name}</Text>
+                      <Text style={styles.rowTextAsistName}>
+                        {store.assistant_cs.name}
+                      </Text>
                       <Text style={styles.rowTextAddress}>{store.address}</Text>
                     </View>
                   </View>
                 }
                 onpress={{
-                  view: () =>
+                  view: () => {
                     this.props.navigation.navigate("FieldHomeProductList", {
-                      objectId: store.objectId
-                    })
+                      objectId: store.objectId,
+                      storeStatus: "pending",
+                      assistant: "outdoor"
+                    });
+                  }
                 }}
                 key={indexes}
               />

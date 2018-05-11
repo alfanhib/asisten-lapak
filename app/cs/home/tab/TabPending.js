@@ -88,7 +88,8 @@ export default class TabPending extends Component {
                 onpress={{
                   view: () =>
                     this.props.navigation.navigate("FieldHomeProductList", {
-                      objectId: store.objectId
+                      objectId: store.objectId,
+                      assistant: "cs"
                     })
                 }}
                 key={indexes}
