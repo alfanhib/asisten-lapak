@@ -164,7 +164,7 @@ export default class FProductList extends Component {
                       </Text>
 
                       {this.props.navigation.state.params.storeStatus ==
-                      "active" &&? null : (
+                      "active" ? null : (
                         <Button
                           full
                           onPress={() => this.actisvateStore()}
