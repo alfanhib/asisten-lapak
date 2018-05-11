@@ -5,7 +5,8 @@ import {
   View,
   RefreshControl,
   ScrollView,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from "react-native";
 import {
   Container,
@@ -159,7 +160,8 @@ export default class FProductList extends Component {
                       <Text style={styles.rowDescription}>
                         Deskripsi: {store.description}
                       </Text>
-                      <Button full onPress={() => this.activateStore()} style={{color="#b4424b"}}>
+                      
+                      <Button full onPress={() => this.activateStore()} style={{backgroundColor: "#b4424b"}}>
                         <Text>Aktifkan Toko</Text>
                       </Button>
                     </View>
