@@ -1,4 +1,5 @@
-const config  ={
-    uri:'https://api.backendless.com/88269424-FF0F-6299-FFAD-98ED78564100/E87E9DE8-BEB5-B6A8-FF2F-758B1D210D00'
-}
-export default config
+const config = {
+  uri:
+    "https://api.backendless.com/825FDE29-62E3-0744-FF7B-F0AEF280ED00/58C2C8E9-BF8E-0CF5-FF38-2FDFDC601500"
+};
+export default config;

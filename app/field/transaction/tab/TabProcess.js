@@ -72,7 +72,7 @@ export default class TabProcess extends Component {
                           {transaction.name}
                         </Text>
                         <Text style={styles.rowTextAddress}>
-                          J{transaction.address}
+                          {transaction.address}
                         </Text>
                         <Text style={styles.rowTextIn}>Ditambahkan</Text>
                         <View style={{ flexDirection: "row" }}>
