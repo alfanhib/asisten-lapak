@@ -86,6 +86,8 @@ export default class FProductList extends Component {
   componentDidMount() {
     this.getAllData();
     this.getAllProduct();
+    const tt = this.props.navigation.state.params.assistant;
+    console.log(this.props.navigation.state.params);
   }
 
   activateStore() {
@@ -160,10 +162,17 @@ export default class FProductList extends Component {
                       <Text style={styles.rowDescription}>
                         Deskripsi: {store.description}
                       </Text>
-                      
-                      <Button full onPress={() => this.activateStore()} style={{backgroundColor: "#b4424b"}}>
-                        <Text>Aktifkan Toko</Text>
-                      </Button>
+
+                      {this.props.navigation.state.params.storeStatus ==
+                      "active" ? null : (
+                        <Button
+                          full
+                          onPress={() => this.actisvateStore()}
+                          style={{ backgroundColor: "#b4424b" }}
+                        >
+                          <Text>Aktifkan Toko</Text>
+                        </Button>
+                      )}
                     </View>
                   </View>
                 }
@@ -234,6 +243,7 @@ export default class FProductList extends Component {
     );
   }
 }
+("");
 
 const styles = StyleSheet.create({
   rowTextCondition: {

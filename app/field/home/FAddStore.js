@@ -216,6 +216,7 @@ export default class CsAddStore extends Component {
   }
 
   allDeliveryServices() {
+
     axios
       .get(
         `${
@@ -229,6 +230,14 @@ export default class CsAddStore extends Component {
         });
       });
   }
+
+  // async allDeliveryServices(){
+  //   const deliveryServices = await axios.get(`${config.uri}/data/delivery_services?pageSize=100&offset=0&sortBy=created%20desc`)
+  //   this.setState({
+  //     deliveryServices: deliveryServices.data,
+  //     loading: false
+  //   })
+  // }
 
   _handleScrollTo = p => {
     if (this.scrollViewRef) {
@@ -319,10 +328,10 @@ export default class CsAddStore extends Component {
   }
 
   componentDidMount() {
-    this.allDeliveryServices(),
-      this.setState({
-        data: { ...this.state.data, status: "Pending" }
-      });
+    this.allDeliveryServices();
+    this.setState({
+      data: { ...this.state.data, status: "Pending" }
+    });
     this.getAllCS();
     this.getAllCategoryTypes();
   }
