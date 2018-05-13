@@ -131,53 +131,77 @@ export default class FProductList extends Component {
         >
           <Content style={{ backgroundColor: "white" }}>
             {this.state.stores.map((store, indexes) => (
-              <Row
-                body={
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      paddingLeft: 20,
-                      paddingRight: 20
-                    }}
-                  >
-                    <Image
-                      style={styles.rowImage}
-                      source={{ uri: store.logo }}
-                    />
-                    <View style={{ flex: 6, paddingLeft: 10 }}>
-                      <Text style={styles.rowTextTitle}>{store.name}</Text>
-                      <Text style={styles.rowSlogan}>"{store.slogan}"</Text>
-                      <Text style={styles.rowTextAsistName}>
-                        Customer: {store.assistant_cs.name}
-                      </Text>
-                      <Text style={styles.rowTextAsistName}>
-                        Outdoor: {store.assistant_outdoor.name}
-                      </Text>
-                      <Text style={styles.rowTextAddress}>
-                        Alamat: {store.address}
-                      </Text>
-                      <Text style={styles.rowWebsite}>
-                        Website: {store.website}
-                      </Text>
-                      <Text style={styles.rowDescription}>
-                        Deskripsi: {store.description}
-                      </Text>
+              <View key={indexes}>
+                <Row
+                  body={
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        paddingLeft: 20,
+                        paddingRight: 20
+                      }}
+                    >
+                      <Image
+                        style={styles.rowImage}
+                        source={{ uri: store.logo }}
+                      />
 
-                      {this.props.navigation.state.params.storeStatus ==
-                      "active" ? null : (
-                        <Button
-                          full
-                          onPress={() => this.actisvateStore()}
-                          style={{ backgroundColor: "#b4424b" }}
-                        >
-                          <Text>Aktifkan Toko</Text>
-                        </Button>
-                      )}
+                      <View style={{ flex: 6, paddingLeft: 10 }}>
+                        <Text style={styles.rowTextTitle}>{store.name}</Text>
+                        <Text style={styles.rowSlogan}>"{store.slogan}"</Text>
+                        <Text style={styles.rowTextAsistName}>
+                          Customer: {store.assistant_cs.name}
+                        </Text>
+                        <Text style={styles.rowTextAsistName}>
+                          Outdoor: {store.assistant_outdoor.name}
+                        </Text>
+                        <Text style={styles.rowTextAddress}>
+                          Alamat: {store.address}
+                        </Text>
+                        <Text style={styles.rowWebsite}>
+                          Website: {store.website}
+                        </Text>
+                        <Text style={styles.rowDescription}>
+                          Deskripsi: {store.description}
+                        </Text>
+                        {this.props.navigation.state.params.storeStatus ==
+                        "active" ? null : (
+                          <Button
+                            full
+                            onPress={() => this.actisvateStore()}
+                            style={{
+                              backgroundColor: "#b4424b",
+                              marginTop: 20
+                            }}
+                          >
+                            <Text>Aktifkan Toko</Text>
+                          </Button>
+                        )}
+                      </View>
                     </View>
-                  </View>
-                }
-                key={indexes}
-              />
+                  }
+                />
+
+                <Row
+                  body={
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flex: 1,
+                        alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <View>
+                        <Text style={{ textAlign: "center" }}>
+                          Product List
+                        </Text>
+                      </View>
+                    </View>
+                  }
+                />
+              </View>
             ))}
 
             {this.state.loading == false && this.state.products.length == 0 ? (

@@ -1,5 +1,5 @@
 const config = {
   uri:
-    "https://api.backendless.com/825FDE29-62E3-0744-FF7B-F0AEF280ED00/58C2C8E9-BF8E-0CF5-FF38-2FDFDC601500"
+    "https://api.backendless.com/8AEB3105-CEF7-F52B-FFB5-00706F0ED400/66E2C63A-7CDE-41E3-FFA3-9E394E32CC00"
 };
 export default config;
